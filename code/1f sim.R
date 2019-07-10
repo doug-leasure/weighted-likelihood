@@ -150,7 +150,6 @@ sim <- function(sampling='weighted', model_weights=T,
   n.iter <- 5e3
   thin <- 1
   n.chains <- 3
-  set.seed(123)
   
   init <- inits(n.chains, jd)
   
@@ -169,7 +168,7 @@ sim <- function(sampling='weighted', model_weights=T,
                  method='parallel' #'rjags' #'rjparallel'
   )
   jm$init <- init
-  jm$seed <- 123
+  jm$seed <- 42
   saveRDS(jm, paste0(outdir,'jm.rds'))
   
   # check traceplots

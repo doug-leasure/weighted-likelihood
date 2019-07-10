@@ -4,6 +4,8 @@ gc()
 cat("\014") 
 try(dev.off())
 
+set.seed(42)
+
 # load packages
 library(runjags);library(boot);library(rjags);library(mcmc)
 

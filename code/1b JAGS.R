@@ -16,10 +16,10 @@ model{
   
   for(t in 1:ntype){
     # med = median (on natural scale) of lognormal distribution
-    med[t] ~ dunif(0, med_real*100)
+    med[t] ~ dunif(0, 5e3)
     
     # sigma = log standard deviation (before weighting)
-    log_sigma[t] ~ dunif(0, log_sigma_real)
+    log_sigma[t] ~ dunif(0, 3)
     
   }
   

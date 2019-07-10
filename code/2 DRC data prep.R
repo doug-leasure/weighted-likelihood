@@ -4,6 +4,8 @@ gc()
 cat("\014") 
 try(dev.off())
 
+set.seed(42)
+
 # load packages
 library(dplyr); library(sf); library(reshape2); library(tidyr); library(purrr); library(svDialogs)
 
@@ -83,11 +85,10 @@ jd_random <- list(id = master_df$ucla_cluster_num[i.random],
                   w = master_df$weight_scaled[i.random] / sum(master_df$weight_scaled[i.random]),
                   type = master_df$ornl_settlement_type_2016[i.random],
                   
-                  ni = length(i.random),
+                  n = length(i.random),
                   ntype = length(unique(master_df$ornl_settlement_type_2016[i.random])),
                   itype1 = which(master_df$ornl_settlement_type_2016[i.random]==1),
-                  itype2 = which(master_df$ornl_settlement_type_2016[i.random]==2),
-                  itype3 = which(master_df$ornl_settlement_type_2016[i.random]==3) 
+                  itype2 = which(master_df$ornl_settlement_type_2016[i.random]==2) 
                   )
 
 # jags data weighted
@@ -98,11 +99,10 @@ jd_weighted <- list(id = master_df$ucla_cluster_num[i.weighted],
                     w= master_df$weight_scaled[i.weighted],
                     type = master_df$ornl_settlement_type_2016[i.weighted],
                     
-                    ni = length(i.weighted),
+                    n = length(i.weighted),
                     ntype = length(unique(master_df$ornl_settlement_type_2016[i.weighted])),
                     itype1 = which(master_df$ornl_settlement_type_2016[i.weighted]==1),
-                    itype2 = which(master_df$ornl_settlement_type_2016[i.weighted]==2),
-                    itype3 = which(master_df$ornl_settlement_type_2016[i.weighted]==3) 
+                    itype2 = which(master_df$ornl_settlement_type_2016[i.weighted]==2) 
                     )
 
 # jags data random and weighted
@@ -112,11 +112,10 @@ jd_all <- list(id = master_df$ucla_cluster_num,
                w= master_df$weight_scaled,
                type = master_df$ornl_settlement_type_2016,
                
-               ni = nrow(master_df),
+               n = nrow(master_df),
                ntype = length(unique(master_df$ornl_settlement_type_2016)),
                itype1 = which(master_df$ornl_settlement_type_2016==1),
-               itype2 = which(master_df$ornl_settlement_type_2016==2),
-               itype3 = which(master_df$ornl_settlement_type_2016==3) 
+               itype2 = which(master_df$ornl_settlement_type_2016==2) 
                )
 
 # write jags data to disk
@@ -154,3 +153,4 @@ legend('topright',legend=c('random','random urban','random rural','weighted','we
        lty=c(2,2,2,1,1,1), lwd=c(2,1,1,2,1,1), col=c('black','red','darkgreen','black','red','darkgreen'))
 
 dev.off()
+
