@@ -96,7 +96,7 @@ i.weighted <- which(master_df$ucla_survey_year==2018)
 jd_weighted <- list(id = master_df$ucla_cluster_num[i.weighted],
                     
                     y = master_df$pop_density[i.weighted],
-                    w= master_df$weight_scaled[i.weighted],
+                    w = master_df$weight_scaled[i.weighted] / sum(master_df$weight_scaled[i.weighted]),
                     type = master_df$ornl_settlement_type_2016[i.weighted],
                     
                     n = length(i.weighted),
@@ -105,11 +105,25 @@ jd_weighted <- list(id = master_df$ucla_cluster_num[i.weighted],
                     itype2 = which(master_df$ornl_settlement_type_2016[i.weighted]==2) 
                     )
 
+# jags data weighted without model weights
+i.weighted <- which(master_df$ucla_survey_year==2018)
+jd_weighted_naive <- list(id = master_df$ucla_cluster_num[i.weighted],
+                    
+                    y = master_df$pop_density[i.weighted],
+                    w = rep(1/length(i.weighted), length(i.weighted)),
+                    type = master_df$ornl_settlement_type_2016[i.weighted],
+                    
+                    n = length(i.weighted),
+                    ntype = length(unique(master_df$ornl_settlement_type_2016[i.weighted])),
+                    itype1 = which(master_df$ornl_settlement_type_2016[i.weighted]==1),
+                    itype2 = which(master_df$ornl_settlement_type_2016[i.weighted]==2) 
+)
+
 # jags data random and weighted
 jd_all <- list(id = master_df$ucla_cluster_num,
                
                y = master_df$pop_density,
-               w= master_df$weight_scaled,
+               w = master_df$weight_scaled / sum(master_df$weight_scaled),
                type = master_df$ornl_settlement_type_2016,
                
                n = nrow(master_df),
@@ -121,36 +135,50 @@ jd_all <- list(id = master_df$ucla_cluster_num,
 # write jags data to disk
 saveRDS(jd_random, file=paste0('out/drc/jd_random.rds'))
 saveRDS(jd_weighted, file=paste0('out/drc/jd_weighted.rds'))
+saveRDS(jd_weighted_naive, file=paste0('out/drc/jd_weighted_naive.rds'))
 saveRDS(jd_all, file=paste0('out/drc/jd_all.rds'))
 
-# density plot
-jpeg('out/drc/data.jpg')
+# density plot: type 1
+jpeg('out/drc/urban_data.jpg')
 
-density_random <- density(jd_random$y)
-density_random_urb <- density(jd_random$y[jd_random$type==1])
-density_random_rur <- density(jd_random$y[jd_random$type==2])
+density_random <- density(jd_random$y[jd_random$type==1])
+density_weighted <- density(jd_weighted$y[jd_weighted$type==1])
+density_all <- density(jd_all$y[jd_all$type==1])
 
-density_weighted <- density(jd_weighted$y)
-density_weighted_urb <- density(jd_weighted$y[jd_weighted$type==1])
-density_weighted_rur <- density(jd_weighted$y[jd_weighted$type==2])
+# xlim <- c(0, quantile(c(density_random$x, density_weighted$x), probs=0.99))
+xlim <- c(0, 1000)
+ylim <- c(0, max(density_random$y, density_weighted$y))
 
-xlim <- c(0, quantile(c(density_random$x, density_random_urb$x, density_random_rur$x, 
-                        density_weighted$x, density_weighted_urb$x, density_weighted_rur$x), probs=0.99))
-ylim <- c(0, max(density_random$y, density_random_urb$y, density_random_rur$y, 
-                 density_weighted$y, density_weighted_urb$y, density_weighted_rur$y))
+plot(NA, xlim=xlim, ylim=ylim, main='Urban', xlab='Population Density', ylab='Probability')
 
-plot(NA, xlim=xlim, ylim=ylim, xlab='Population Density', ylab='Probability')
+lines(density_random, col='black', lwd=2, lty=3)
+lines(density_weighted, col='black', lwd=2, lty=2)
+lines(density_all, col='black', lwd=1, lty=1)
 
-lines(density_random, col='black', lwd=2, lty=2)
-lines(density_random_urb, col='red', lwd=1, lty=2)
-lines(density_random_rur, col='darkgreen', lwd=1, lty=2)
+legend('topright',legend=c('Random','Weighted','All'),
+       lty=c(3,2,1), lwd=c(2,2,1), col='black')
 
-lines(density_weighted, col='black', lwd=2, lty=1)
-lines(density_weighted_urb, col='red', lwd=1, lty=1)
-lines(density_weighted_rur, col='darkgreen', lwd=1, lty=1)
+dev.off()
 
-legend('topright',legend=c('random','random urban','random rural','weighted','weighted urban','weighted rural'),
-       lty=c(2,2,2,1,1,1), lwd=c(2,1,1,2,1,1), col=c('black','red','darkgreen','black','red','darkgreen'))
+# density plot: type 2
+jpeg('out/drc/rural_data.jpg')
+
+density_random <- density(jd_random$y[jd_random$type==2])
+density_weighted <- density(jd_weighted$y[jd_weighted$type==2])
+density_all <- density(jd_all$y[jd_all$type==2])
+
+# xlim <- c(0, quantile(c(density_random$x, density_weighted$x), probs=0.99))
+xlim <- c(0, 1000)
+ylim <- c(0, max(density_random$y, density_weighted$y))
+
+plot(NA, xlim=xlim, ylim=ylim, main='Rural', xlab='Population Density', ylab='Probability')
+
+lines(density_random, col='black', lwd=2, lty=3)
+lines(density_weighted, col='black', lwd=2, lty=2)
+lines(density_all, col='black', lwd=1, lty=1)
+
+legend('topright',legend=c('Random','Weighted','All'),
+       lty=c(3,2,1), lwd=c(2,2,1), col='black')
 
 dev.off()
 

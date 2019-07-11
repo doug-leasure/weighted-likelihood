@@ -9,13 +9,16 @@ set.seed(42)
 # load packages
 library(runjags);library(boot);library(rjags);library(mcmc)
 
+# working directory
+setwd('C:/RESEARCH/2018 GRID3 WorldPop/git/wpgp/weighted-likelihood')
+
 # output directory
 outdir <- 'out/drc/'
 
 # initials function
 source('code/1f inits.R')
 
-mods <- c('random','weighted','all')
+mods <- c('random','weighted','weighted_naive','all')
 
 for(m in mods){
   # data
@@ -82,22 +85,23 @@ for(m in mods){
   density_yhat1 <- density(yhat1)
   density_yhat2 <- density(yhat2)
   
-  xlim <- c(0, quantile(c(yhat1,yhat2), probs=0.99))
+  # xlim <- c(0, quantile(c(yhat1,yhat2), probs=0.99))
+  xlim <- c(0, 1000)
   ylim <- c(0, max(density_y1$y, density_y2$y, density_yhat1$y, density_yhat2$y))
   
-  plot(NA, xlim=xlim, ylim=ylim, xlab='Population', ylab='Probability')
+  plot(NA, xlim=xlim, ylim=ylim, main=m, xlab='Population', ylab='Probability')
   
   lines(density_yhat1, col='black', lwd=2, lty=1)
-  lines(density_yhat2, col='black', lwd=2, lty=1)
-  
   lines(density_y1, col='black', lwd=2, lty=3)
-  lines(density_y2, col='black', lwd=2, lty=3)
+  
+  lines(density_yhat2, col='darkgrey', lwd=2, lty=1)
+  lines(density_y2, col='darkgrey', lwd=2, lty=3)
     
 
-  legend('topright', legend=c('Estimated','Sample'),
-         col=c('black','black'),
-         lwd=c(2,2),
-         lty=c(1,3))
+  legend('topright', legend=c('Urban model','Urban data', 'Rural model','Rural data'),
+         col=c('black','black','darkgrey','darkgrey'),
+         lwd=2,
+         lty=c(1,3,1,3))
   
   dev.off()
   
