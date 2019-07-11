@@ -1,6 +1,6 @@
 # weighted-likelihood
 
-This repository has code for:
+This repository has code to:
 1. Simulate random and population-weighted sampling + fit weighted likelihood models
 2. Use random and population-weighted sampling data from Kinshasa + fit weighted likelihood models
 3. Manuscript to report results (LaTeX)
