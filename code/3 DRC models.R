@@ -89,7 +89,7 @@ for(m in mods){
   xlim <- c(0, 1000)
   ylim <- c(0, max(density_y1$y, density_y2$y, density_yhat1$y, density_yhat2$y))
   
-  plot(NA, xlim=xlim, ylim=ylim, main=m, xlab='Population', ylab='Probability')
+  plot(NA, xlim=xlim, ylim=ylim, main=paste('Model:',m), xlab='Population Density', ylab='Probability')
   
   lines(density_yhat1, col='black', lwd=2, lty=1)
   lines(density_y1, col='black', lwd=2, lty=3)
@@ -98,7 +98,7 @@ for(m in mods){
   lines(density_y2, col='darkgrey', lwd=2, lty=3)
     
 
-  legend('topright', legend=c('Urban model','Urban data', 'Rural model','Rural data'),
+  legend('topright', legend=c('Urban posterior','Urban data', 'Rural posterior','Rural data'),
          col=c('black','black','darkgrey','darkgrey'),
          lwd=2,
          lty=c(1,3,1,3))

@@ -48,8 +48,9 @@ rm(ornl_settlementType)
 clusters$ucla_cluster_num <-  1:length(unique(clusters$ucla_cluster_id))
 
 # population densities
+pixelarea <- 0.84
 clusters <- clusters %>% left_join(cod_survey_covariates %>% dplyr::select(ucla_cluster_id,ornl_settlementCluster_2016_density_sum )) %>% 
-            mutate(pop_density = ucla_cluster_resident_count/ ornl_settlementCluster_2016_density_sum)
+            mutate(pop_density = ucla_cluster_resident_count/ (ornl_settlementCluster_2016_density_sum * pixelarea))
 
 clusters$area <- clusters$ornl_settlementCluster_2016_density_sum
 
@@ -149,14 +150,15 @@ density_all <- density(jd_all$y[jd_all$type==1])
 xlim <- c(0, 1000)
 ylim <- c(0, max(density_random$y, density_weighted$y))
 
-plot(NA, xlim=xlim, ylim=ylim, main='Urban', xlab='Population Density', ylab='Probability')
+plot(NA, xlim=xlim, ylim=ylim, main=paste('Urban','Data'), xlab='Population Density', ylab='Probability')
 
 lines(density_random, col='black', lwd=2, lty=3)
 lines(density_weighted, col='black', lwd=2, lty=2)
 lines(density_all, col='black', lwd=1, lty=1)
 
 legend('topright',legend=c('Random','Weighted','All'),
-       lty=c(3,2,1), lwd=c(2,2,1), col='black')
+       lty=c(3,2,1), lwd=c(2,2,1), col='black',
+       bty='n')
 
 dev.off()
 
@@ -171,14 +173,15 @@ density_all <- density(jd_all$y[jd_all$type==2])
 xlim <- c(0, 1000)
 ylim <- c(0, max(density_random$y, density_weighted$y))
 
-plot(NA, xlim=xlim, ylim=ylim, main='Rural', xlab='Population Density', ylab='Probability')
+plot(NA, xlim=xlim, ylim=ylim, main=paste('Rural', 'Data'), xlab='Population Density', ylab='Probability')
 
 lines(density_random, col='black', lwd=2, lty=3)
 lines(density_weighted, col='black', lwd=2, lty=2)
 lines(density_all, col='black', lwd=1, lty=1)
 
 legend('topright',legend=c('Random','Weighted','All'),
-       lty=c(3,2,1), lwd=c(2,2,1), col='black')
+       lty=c(3,2,1), lwd=c(2,2,1), col='black',
+       bty='n')
 
 dev.off()
 
