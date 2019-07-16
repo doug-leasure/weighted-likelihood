@@ -8,7 +8,7 @@
 \templatetype{pnasresearcharticle} 
 
 % Title
-\title{Estimating populations at high resolution in data-poor regions using commonly available population-weighted household survey data}
+\title{Estimating populations in data-poor regions using commonly available population-weighted household survey data}
 
 % Author list
 \author[a,1]{Douglas R. Leasure}
@@ -68,6 +68,33 @@ We developed a Bayesian weighted-likelihood model for use with standard househol
 
 \subsection*{Results}
 
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{sim_model.jpg}
+	\caption{Models fit to data from each simulation.}
+	\label{fig:sim_model}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{sim_totals.jpg}
+	\caption{Population totals for urban and rural areas for each simulation. The dashed lines show the actual population totals defined by the simulation for each settlement type.}
+	\label{fig:sim_totals}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{drc_model.jpg}
+	\caption{Models fit to microcensus data from Kinshasa.}
+	\label{fig:drc_model}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{drc_totals.jpg}
+	\caption{Population totals for urban and rural areas of Kinshasa with random and weighted datasets.}
+	\label{fig:drc_totals}
+\end{figure}
 
 
 \subsection*{Discussion}
@@ -87,22 +114,29 @@ We developed a Bayesian weighted-likelihood model for use with standard househol
 	
 	\noindent where $N_j$ is the population size at location $j$, and $J$ is the total number of simulated locations (\textit{i.e.} 10,000).
 	
-	Six scenarios were simulated:
+	Four scenarios were simulated:
 	
 	\begin{enumerate}
-		\item Random sampling from urban locations
-		\item Random sampling from urban and rural locations
-		\item Weighted sampling from urban locations
-		\item Weighted sampling from urban and rural locations
-		\item Random and weighted sampling from urban locations
-		\item Random and weighted sampling from urban and rural locations
+		\item Stratified random sampling with an unweighted model
+		\item Stratified weighted sampling with an unweighted model
+		\item Stratified weighted sampling with a weighted-likelihood model
+		\item Stratified random and weighted sampling with a weighted-likelihood model
 	\end{enumerate}  
 	
 	\subsection{Real Data}
 	
-	Two rounds of microcensuses were conducted throughout the Kinshasa province in the Democratic Republic of the Congo (DRC) to collect demographic and socio-economic data for population mapping and estimation. The 2017 microcensus targeted 104 locations using stratified spatial-random sampling \cite{}, while the 2018 microcensus targeted 183 locations using stratified population-weighted sampling \cite{}. Both rounds of microcensuses enumerated all people within the target-locations (i.e. microcensus clusters), which comprised approximatively three hectares of settled area within clearly defined boundaries. 
-  The stratification adopted in 2017 was based on a morphological settlement classification derived from the LandScanHD database \cite{} consisting of urban, hamlet, and rural settlement types. Microcensus-clusters were then selected from each stratum through spatial-random sampling. The stratification adopted in 2018 was based on a k-means clustering of principal components derived from a set of 16 gridded covariates produced by the WorldPop project \cite{}. This classified each 100 m grid cell as one of three settlement types, labelled as urban, peri-urban, and rural settlement types. Microcensus clusters were then selected using population-weighted sampling, based on the number of people per grid cell estimated by the WorldPop project \cite{}.
-  In both rounds of microcensuses, a one-stage survey design was implemented, where a listing for each microcensus cluster was created on the same day as the surveys were conducted \cite{}. The surveys produced a roster of individuals in the housing units with basic demographic and socio-economic characteristics (e.g. age, gender, and education). If no respondent was available at the time of the survey, a neighbour could answer in lieu. If no respondent could be identified after three attempts, the size of the housing unit was imputed using the mean value for the microcensus cluster. 
+	\begin{figure}
+		\centering
+		\includegraphics[width=1\linewidth]{doh.png}
+		\caption{Map of Kinshasa showing locations of microcensus surveys (random and weighted samples) and settlement types (urban and rural).}
+		\label{fig:kinshasa}
+	\end{figure}
+	
+	Two rounds of microcensuses were conducted throughout the Kinshasa province in the Democratic Republic of the Congo (DRC) to collect demographic and socio-economic data for population mapping and estimation (Fig. \ref{fig:kinshasa}). The 2017 microcensus targeted 104 locations using stratified spatial-random sampling \cite{}, while the 2018 microcensus targeted 183 locations using stratified population-weighted sampling \cite{}. Both rounds of microcensuses enumerated all people within the target-locations (i.e. microcensus clusters), which comprised approximatively three hectares of settled area within clearly defined boundaries. 
+	
+	The stratification adopted in 2017 was based on a morphological settlement classification derived from the LandScanHD database \cite{} consisting of urban, hamlet, and rural settlement types. Microcensus-clusters were then selected from each stratum through spatial-random sampling. The stratification adopted in 2018 was based on a k-means clustering of principal components derived from a set of 16 gridded covariates produced by the WorldPop project \cite{}. This classified each 100 m grid cell as one of three settlement types, labelled as urban, peri-urban, and rural settlement types. Microcensus clusters were then selected using population-weighted sampling, based on the number of people per grid cell estimated by the WorldPop project \cite{}.
+	
+	In both rounds of microcensuses, a one-stage survey design was implemented, where a listing for each microcensus cluster was created on the same day as the surveys were conducted \cite{}. The surveys produced a roster of individuals in the housing units with basic demographic and socio-economic characteristics (e.g. age, gender, and education). If no respondent was available at the time of the survey, a neighbour could answer in lieu. If no respondent could be identified after three attempts, the size of the housing unit was imputed using the mean value for the microcensus cluster. 
 	
 	\subsection{Data Analysis}
 	
