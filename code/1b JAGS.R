@@ -36,8 +36,8 @@ model{
   }
   
   # LOG_SIGMA = weighted average of sig among samples
-  LOG_SIGMA[1] <- sum( log_sig[itype1] * w[itype1] ) / sum( w[itype1] )
-  LOG_SIGMA[2] <- ifelse(ntype==2, sum( log_sig[itype2] * w[itype2] ) / sum( w[itype2] ), 0)
+  LOG_SIGMA[1] <- sum( log_sig[itype1] * sqrt(w[itype1]) ) / sum(sqrt( w[itype1] ))
+  LOG_SIGMA[2] <- ifelse(ntype==2, sum( log_sig[itype2] * sqrt(w[itype2]) ) / sum( sqrt(w[itype2]) ), 0)
 
   
 }

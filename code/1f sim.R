@@ -52,7 +52,13 @@ sim <- function(sampling='weighted', model_weights=T,
   
   #--------------------------#
   
-  weights <- weights_calc(numerator1=real, denominator=sum(real))
+  weights <- weights1 <- weights_calc(numerator1=real1, denominator=sum(real1))
+  
+  if(ntype==2) {
+    weights2 <- weights_calc(numerator1=real2, denominator=sum(real2))
+    
+    weights <- c(weights1, weights2)
+  }
   
   if(!strat_samp | ntype==1){
     # draw a pop-weighted sample
