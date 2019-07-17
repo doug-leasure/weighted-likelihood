@@ -2,7 +2,7 @@
 sim <- function(sampling='weighted', model_weights=T,
                 n.weighted=500, n.random=500, n.real=1e4,
                 ntype=1, type1_prop=0.5, strat_samp=T,
-                med1=750, sigma1=500, med2=100, sigma2=250, 
+                med1=300, sigma1=300, med2=100, sigma2=100, 
                 outdir='sim'){
   # sampling='weighted'; model_weights=T;
   # n.weighted=500; n.random=500; n.real=1e4;
@@ -28,8 +28,10 @@ sim <- function(sampling='weighted', model_weights=T,
     type2_prop <- 1-type1_prop
     n.real1 <- round(n.real*type1_prop)
     n.real2 <- round(n.real*type2_prop)
+    ntotal <- c(n.real1, n.real2)
   } else {
     n.real1 <- n.real
+    ntotal <- c(n.real)
   }
   
   log_sigma1 <- sig_to_log(med1, sigma1)
@@ -69,6 +71,7 @@ sim <- function(sampling='weighted', model_weights=T,
     
     # combine random + weighted
     random_weighted <- c(weighted, random)
+    
   } else {
     i1 <- 1:n.real1
     i2 <- (n.real1):length(real)
@@ -133,18 +136,18 @@ sim <- function(sampling='weighted', model_weights=T,
   # data
   jd <- list(n = length(y),
              y = y,
+             a = 1,
+             ntotal = ntotal,
              w = inv.weights,
              type = type,
              ntype = ntype,
              itype1 = itype1,
-             itype2 = itype2,
-             med_real = median(real),
-             log_sigma_real = sig_to_log(median(real), sd(real))
+             itype2 = itype2
   )
   saveRDS(jd, paste0(outdir,'jd.rds'))
   
   # monitor
-  par.monitor <- c('med','SIGMA','LOG_SIGMA','yhat')
+  par.monitor <- c('med','log_sigma','SIGMA','LOG_SIGMA','yhat')
   
   # modules
   load.module('lecuyer')
@@ -160,7 +163,7 @@ sim <- function(sampling='weighted', model_weights=T,
   init <- inits(n.chains, jd)
   
   # run jags
-  jm <- run.jags(model='code/1b JAGS.R', 
+  jm <- run.jags(model='code/JAGS.R', 
                  monitor=par.monitor, 
                  data=jd, 
                  n.chains=n.chains, 
@@ -180,9 +183,9 @@ sim <- function(sampling='weighted', model_weights=T,
   # check traceplots
   pdf(paste0(outdir,'trace.pdf'))
   if(ntype==2) {
-    traceplot(jm$mcmc[,c(paste0('med[',1:2,']'),paste0('SIGMA[',1:2,']'))])
+    traceplot(jm$mcmc[,c(paste0('med[',1:2,']'),paste0('log_sigma[',1:2,']'),paste0('SIGMA[',1:2,']'))])
   } else {
-    traceplot(jm$mcmc[,c('med','SIGMA')])
+    traceplot(jm$mcmc[,c('med','log_sigma','SIGMA')])
   }
   dev.off()
   
@@ -191,94 +194,101 @@ sim <- function(sampling='weighted', model_weights=T,
   for(i in 2:length(jm$mcmc)){
     d <- rbind(d, jm$mcmc[[i]])
   }
+  
+  # posterior for pop totals
+  for(t in 1:jd$ntype){
+    d[,paste0('poptotal[',t,']')] <- apply(d, 1, totalpop, jd, t)
+  }
+  
+  # save to disk
   write.csv(d, file=paste0(outdir,'d.csv'), row.names=F)
   
-  #-----------------------------------------------#
-  
-  jpeg(paste0(outdir,'model.jpg'))
-  if(ntype==2){
-    # yhat predictions
-    yhat1 <- d$`yhat[1]`
-    yhat2 <- d$`yhat[2]`
-    
-    # plot densities
-    density_y1 <- density(jd$y[jd$type==1])
-    density_y2 <- density(jd$y[jd$type==2])
-    
-    density_real1 <- density(real1)
-    density_real2 <- density(real2)
-    
-    density_yhat1 <- density(yhat1)
-    density_yhat2 <- density(yhat2)
-    
-    xlim <- c(0, quantile(real, probs=0.99))
-    ylim <- c(0, max(density_y1$y, density_y2$y, density_real1$y, density_real2$y, density_yhat1$y, density_yhat2$y))
-    
-    plot(NA, xlim=xlim, ylim=ylim, xlab='Population', ylab='Probability')
-    
-    lines(density_real1, col='gray', lwd=2, lty=2)
-    lines(density_real2, col='gray', lwd=2, lty=2)
-    
-    lines(density_yhat1, col='black', lwd=2, lty=1)
-    lines(density_yhat2, col='black', lwd=2, lty=1)
-
-    lines(density_y1, col='black', lwd=2, lty=3)
-    lines(density_y2, col='black', lwd=2, lty=3)
-    
-  } else {
-    
-    # yhat predictions
-    yhat1 <- d$yhat
-    
-    # plot densities
-    density_real1 <- density(real1)
-    
-    density_y <- density(jd$y)
-    
-    density_yhat1 <- density(yhat1)
-    
-    xlim <- c(0, quantile(real, probs=0.99))
-    ylim <- c(0, max(density_y$y, density_real1$y, density_yhat1$y))
-    
-    plot(NA, xlim=xlim, ylim=ylim, xlab='Population',ylab='Probability')
-    
-    lines(density_real1, col='gray', lwd=2, lty=2)
-    lines(density_yhat1, col='black', lwd=2, lty=1)
-    lines(density_y, col='black', lwd=2, lty=3)
-  }
-  
-  legend('topright', legend=c('True','Estimated','Sample'),
-         col=c('gray','black','black'),
-         lwd=c(2,2,2),
-         lty=c(2,1,3))
-  
-  dev.off()
-  
-  #-----------------------------------#
-  
-  jpeg(paste0(outdir,'totals.jpg'))
-  
-  if(ntype==1){
-    total1 <- sum(rlnorm(n.real1, log(mean(d$`med`)), mean(d$`LOG_SIGMA[1]`) ) )
-    
-    barplot(height=matrix(c(sum(real1), total1), ncol=1, byrow=T), 
-            beside=T, space=0.1,
-            legend.text=c('True','Estimated'),
-            main='Population Total')
-  }
-  
-  if(ntype==2){
-    total1 <- sum(rlnorm(n.real1, log(mean(d$`med[1]`)), mean(d$`LOG_SIGMA[1]`) ) )
-    total2 <- sum(rlnorm(n.real2, log(mean(d$`med[2]`)), mean(d$`LOG_SIGMA[2]`) ) )
-    
-    barplot(height=matrix(c(sum(real1), sum(real2), total1, total2), ncol=2, byrow=T), 
-            beside=T,
-            names=c('Type 1', 'Type 2'),
-            legend.text=c('True','Estimated'),
-            main='Population Total')
-  } 
-   
-  dev.off()
+  # #-----------------------------------------------#
+  # 
+  # jpeg(paste0(outdir,'model.jpg'))
+  # if(ntype==2){
+  #   # yhat predictions
+  #   yhat1 <- d$`yhat[1]`
+  #   yhat2 <- d$`yhat[2]`
+  #   
+  #   # plot densities
+  #   density_y1 <- density(jd$y[jd$type==1])
+  #   density_y2 <- density(jd$y[jd$type==2])
+  #   
+  #   density_real1 <- density(real1)
+  #   density_real2 <- density(real2)
+  #   
+  #   density_yhat1 <- density(yhat1)
+  #   density_yhat2 <- density(yhat2)
+  #   
+  #   xlim <- c(0, quantile(real, probs=0.99))
+  #   ylim <- c(0, max(density_y1$y, density_y2$y, density_real1$y, density_real2$y, density_yhat1$y, density_yhat2$y))
+  #   
+  #   plot(NA, xlim=xlim, ylim=ylim, xlab='Population', ylab='Probability')
+  #   
+  #   lines(density_real1, col='gray', lwd=2, lty=2)
+  #   lines(density_real2, col='gray', lwd=2, lty=2)
+  #   
+  #   lines(density_yhat1, col='black', lwd=2, lty=1)
+  #   lines(density_yhat2, col='black', lwd=2, lty=1)
+  # 
+  #   lines(density_y1, col='black', lwd=2, lty=3)
+  #   lines(density_y2, col='black', lwd=2, lty=3)
+  #   
+  # } else {
+  #   
+  #   # yhat predictions
+  #   yhat1 <- d$yhat
+  #   
+  #   # plot densities
+  #   density_real1 <- density(real1)
+  #   
+  #   density_y <- density(jd$y)
+  #   
+  #   density_yhat1 <- density(yhat1)
+  #   
+  #   xlim <- c(0, quantile(real, probs=0.99))
+  #   ylim <- c(0, max(density_y$y, density_real1$y, density_yhat1$y))
+  #   
+  #   plot(NA, xlim=xlim, ylim=ylim, xlab='Population',ylab='Probability')
+  #   
+  #   lines(density_real1, col='gray', lwd=2, lty=2)
+  #   lines(density_yhat1, col='black', lwd=2, lty=1)
+  #   lines(density_y, col='black', lwd=2, lty=3)
+  # }
+  # 
+  # legend('topright', legend=c('True','Estimated','Sample'),
+  #        col=c('gray','black','black'),
+  #        lwd=c(2,2,2),
+  #        lty=c(2,1,3))
+  # 
+  # dev.off()
+  # 
+  # #-----------------------------------#
+  # 
+  # jpeg(paste0(outdir,'totals.jpg'))
+  # 
+  # if(ntype==1){
+  #   total1 <- sum(rlnorm(n.real1, log(mean(d$`med`)), mean(d$`LOG_SIGMA[1]`) ) )
+  #   
+  #   barplot(height=matrix(c(sum(real1), total1), ncol=1, byrow=T), 
+  #           beside=T, space=0.1,
+  #           legend.text=c('True','Estimated'),
+  #           main='Population Total')
+  # }
+  # 
+  # if(ntype==2){
+  #   total1 <- sum(rlnorm(n.real1, log(mean(d$`med[1]`)), mean(d$`LOG_SIGMA[1]`) ) )
+  #   total2 <- sum(rlnorm(n.real2, log(mean(d$`med[2]`)), mean(d$`LOG_SIGMA[2]`) ) )
+  #   
+  #   barplot(height=matrix(c(sum(real1), sum(real2), total1, total2), ncol=2, byrow=T), 
+  #           beside=T,
+  #           names=c('Type 1', 'Type 2'),
+  #           legend.text=c('True','Estimated'),
+  #           main='Population Total')
+  # } 
+  #  
+  # dev.off()
   
 }
   

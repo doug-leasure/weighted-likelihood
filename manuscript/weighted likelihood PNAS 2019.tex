@@ -85,7 +85,7 @@ We developed a Bayesian weighted-likelihood model for use with standard househol
 \begin{figure}
 	\centering
 	\includegraphics[width=1\linewidth]{drc_model.jpg}
-	\caption{Models fit to microcensus data from Kinshasa.}
+	\caption{Models fit to microcensus data from Kinshasa. The weighted samples from urban areas had two outliers (~1500 people per hectare) that are not shown in the plots.}
 	\label{fig:drc_model}
 \end{figure}
 
@@ -106,13 +106,13 @@ We developed a Bayesian weighted-likelihood model for use with standard househol
 	
 	\subsection{Simulated Data}
 	
-	Populations were simulated using 10,000 random draws from log-normal distributions to represent the number of people in 10,000 different locations. An urban settlement type was simulated using a median of 750 and a standard deviation of 500 to parameterise the log-normal distribution.  A rural settlement type was simulated using a median of 100 and a standard deviation of 250. In simulations that included both settlement types, half of the locations were urban and half were rural.
+	Populations were simulated using 10,000 random draws from log-normal distributions to represent a census of a population with people in 10,000 different locations (i.e. each location is a one hectare grid square). Population densities in urban areas were simulated using a median population density of 750 people per hectare with a standard deviation of 500 to parameterise the log-normal distribution.  Populations in rural areas were simulated using a median of 100 and a standard deviation of 250. Half of the locations were urban and half were rural.
 	
-	Simulated populations were sampled using either random sampling, population-weighted sampling, or both. A total of 1,000 samples were collected for each simulation. In simulations that included both types of sampling, half of the samples were random and half were population-weighted.  For simulated populations that included two settlement types, stratified sampling was implemented to ensure that an equal number of samples was collected from each settlement type. Population-weighted sampling used sample weights $w_j$ to define the probabilities for each location $j$ being sampled:
+	These simulated populations were sampled using spatial-random sampling, population-weighted sampling, or both. Samples comprised a total of 1,000 locations that were enumerated in each simulated population (i.e. a 10\% sample from the total population of 10,000 locations). In simulations that included both types of sampling, half of the samples were random and half were population-weighted.  Stratified sampling was implemented so that an equal number of samples were collected from urban and rural areas. Population-weighted sampling used sample weights $w_j$ to define the probabilities for each location $j$ being sampled:
 	
 	\[ w_j = \frac{N_j}{\sum_{j=1}^{J} N_j } \]
 	
-	\noindent where $N_j$ is the population size at location $j$, and $J$ is the total number of simulated locations (\textit{i.e.} 10,000).
+	\noindent where $N_j$ is the population size at location $j$, and $J$ is the total number of simulated locations (\textit{i.e.} $J = 10,000$).
 	
 	Four scenarios were simulated:
 	
@@ -132,7 +132,7 @@ We developed a Bayesian weighted-likelihood model for use with standard househol
 		\label{fig:kinshasa}
 	\end{figure}
 	
-	Two rounds of microcensuses were conducted throughout the Kinshasa province in the Democratic Republic of the Congo (DRC) to collect demographic and socio-economic data for population mapping and estimation (Fig. \ref{fig:kinshasa}). The 2017 microcensus targeted 104 locations using stratified spatial-random sampling \cite{}, while the 2018 microcensus targeted 183 locations using stratified population-weighted sampling \cite{}. Both rounds of microcensuses enumerated all people within the target-locations (i.e. microcensus clusters), which comprised approximatively three hectares of settled area within clearly defined boundaries. 
+	Two rounds of microcensuses were conducted throughout the Kinshasa province in the Democratic Republic of the Congo (DRC) to collect demographic and socio-economic data for population mapping and estimation (Fig. \ref{fig:kinshasa}). The 2017 microcensus targeted 104 locations using stratified spatial-random sampling \cite{}, while the 2018 microcensus targeted 183 locations using stratified population-weighted sampling \cite{}. Both rounds of microcensuses enumerated all people within the target-locations (i.e. microcensus clusters), each comprising approximatively three hectares of settled area within clearly defined boundaries. 
 	
 	The stratification adopted in 2017 was based on a morphological settlement classification derived from the LandScanHD database \cite{} consisting of urban, hamlet, and rural settlement types. Microcensus-clusters were then selected from each stratum through spatial-random sampling. The stratification adopted in 2018 was based on a k-means clustering of principal components derived from a set of 16 gridded covariates produced by the WorldPop project \cite{}. This classified each 100 m grid cell as one of three settlement types, labelled as urban, peri-urban, and rural settlement types. Microcensus clusters were then selected using population-weighted sampling, based on the number of people per grid cell estimated by the WorldPop project \cite{}.
 	
@@ -140,7 +140,7 @@ We developed a Bayesian weighted-likelihood model for use with standard househol
 	
 	\subsection{Data Analysis}
 	
-	We used a log-normal weighted-likelihood model to represent the distribution of population sizes among locations:
+	We used a log-normal weighted-likelihood model to represent the distribution of population densities among locations:
 	
 	\[ y_i \sim LogNormal( log( \mu_t ), \tau_{t,i} ) \]
 	
@@ -148,18 +148,15 @@ We developed a Bayesian weighted-likelihood model for use with standard househol
 	
 	\[ v_i = \frac{ w_i^{-1} } { \sum_{i=1}^{I} w_i^{-1} }  \]
 	
-	\noindent where $i$ is a sampled location and $I$ is the total number of sampled locations (\textit{i.e.} 1,000).  Model weights are the inverse of sample weights that are re-scaled to sum to one among all sampled locations.
+	\noindent where $i$ is a sampled location and $I$ is the total number of sampled locations (i.e. $I = 1,000$).  Model weights are the inverse of sample weights rescaled to sum to one among all sampled locations.
 	
-	$\tau_i$ is a location-specific estimate of precision (\textit{i.e.} the inverse of variance) that is dependent on the model weights $v_i$ and a global estimate of precision $\bar{\tau}_t$:
+	$\tau_i$ is a location-specific estimate of precision (i.e. the inverse of variance; on the log scale) that is dependent on the model weights $v_i$ and a global estimate of precision $\bar{\tau}_t$:
 	
 	\[ \tau_{t,i} = \bar{\tau}_t v_i \]
 	
-	
-	
-	
 	We defined the prior distributions of $\mu_t$ and $\bar{\tau}_t$ using uninformative uniform distributions:
-	 \[ \mu_t \sim Uniform(0, X) \]
-	 \[ \bar{\tau}_t \sim Uniform(0, X) \]
+	 \[ \mu_t \sim Uniform(0, 5000) \]
+	 \[ \bar{\tau}_t \sim Uniform(0, 3) \]
 	
 	$\bar{\tau}_t$ cannot be used to predict $y$ in new locations where model weights are not available.  So, we used a weighted average of $\tau_{t,i}$ to derive an estimate of precision for each settlement type that can be used for predictions in new locations:
 	

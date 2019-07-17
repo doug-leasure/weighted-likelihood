@@ -16,10 +16,10 @@ model{
   
   for(t in 1:ntype){
     # med = median (on natural scale) of lognormal distribution
-    med[t] ~ dunif(0, 5e3)
+    med[t] ~ dunif(0, 1e3)
     
     # sigma = log standard deviation (before weighting)
-    log_sigma[t] ~ dunif(0, 3)
+    log_sigma[t] ~ dunif(1e-3, 1)
     
   }
   
@@ -32,13 +32,16 @@ model{
     
     # NAT_SIGMA = LOG_SIGMA converted to natural scale
     SIGMA[t] <- sqrt( exp( 2 * log(med[t]) + LOG_SIGMA[t]^2 ) * ( exp( LOG_SIGMA[t]^2 ) - 1 ) )
-
   }
   
-  # LOG_SIGMA = weighted average of sig among samples
-  LOG_SIGMA[1] <- sum( log_sig[itype1] * sqrt(w[itype1]) ) / sum(sqrt( w[itype1] ))
-  LOG_SIGMA[2] <- ifelse(ntype==2, sum( log_sig[itype2] * sqrt(w[itype2]) ) / sum( sqrt(w[itype2]) ), 0)
+  # # LOG_SIGMA = weighted average of sig among samples
+  # LOG_SIGMA[1] <- sum( log_sig[itype1] * w[itype1] ) / sum( w[itype1] )
+  # LOG_SIGMA[2] <- ifelse(ntype<2, 0, sum( log_sig[itype2] * w[itype2] ) / sum( w[itype2] ))
 
+  # LOG_SIGMA = sqrt weighted average of sig among samples
+  LOG_SIGMA[1] <- sum( log_sig[itype1] * sqrt(w[itype1]) ) / sum(sqrt( w[itype1] ))
+  LOG_SIGMA[2] <- ifelse(ntype<2, 0, sum( log_sig[itype2] * sqrt(w[itype2]) ) / sum( sqrt(w[itype2]) ))
+  
   
 }
 
