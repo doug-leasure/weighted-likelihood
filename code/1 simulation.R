@@ -19,7 +19,7 @@ dir.create('out/sims', showWarnings=F)
 # source functions
 funs <- list.files('code/functions') 
 for(fun in funs) source(paste0('code/functions/',fun))
-source('code/1b sim.R')
+source('code/1b sim function.R')
 
 #==== simulations ====#
 
@@ -38,7 +38,7 @@ sim(sampling='combined', n.random=500, n.weighted=500, ntype=2, outdir='sims/com
 #======= plots =====#
 
 # plot (4 panel) of data and model
-source('code/1c plot sim model.R')
+source('code/1c plot model.R')
 
 # plot of population totals for each model
-source('code/1d plot sim totals.R')
+source('code/1d plot totals.R')

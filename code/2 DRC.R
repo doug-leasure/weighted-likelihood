@@ -12,9 +12,13 @@ library(dplyr); library(sf); library(reshape2); library(tidyr); library(purrr); 
 # working directory
 setwd('C:/RESEARCH/2018 GRID3 WorldPop/git/wpgp/weighted-likelihood')
 
-# create sub-directories
+# create directories
 dir.create('out', showWarnings=F)
 dir.create('out/drc', showWarnings=F)
+dir.create('out/drc/random', showWarnings=F)
+dir.create('out/drc/weighted_naive', showWarnings=F)
+dir.create('out/drc/weighted', showWarnings=F)
+dir.create('out/drc/combined', showWarnings=F)
 
 # data
 source('code/2b data.R')

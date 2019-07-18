@@ -11,17 +11,17 @@ sim <- function(sampling='weighted', model_weights=T,
   # med2=1000; sigma2=500;
   # outdir='sim'
   
+  # create directories
   outdir <- paste0('out/', outdir, '/')
   dir.create(outdir, showWarnings=F)
   
-  #------------------------------------------#
-  
+  # save arguments
   write.csv(data.frame(argument = c('sampling','n.weighted', 'n.random','ntype','type1_prop', 'med1', 'sigma1', 'med2', 'sigma2', 'outdir'),
                        value = c(sampling, n.weighted, n.random, ntype, type1_prop, med1, sigma1, med2, sigma2, outdir)),
             file=paste0(outdir,'args.csv'),
             row.names=F)
   
-  #------------------------------------------#
+  #-------------------- simulate real population (i.e. census) ----------------------#
   
   # simulate real population distribution
   if(ntype==2) {
@@ -52,7 +52,7 @@ sim <- function(sampling='weighted', model_weights=T,
   
   saveRDS(real, file=paste0(outdir, 'real.rds'))
   
-  #--------------------------#
+  #------------ sample from population (i.e. microcensus) --------------#
   
   weights <- weights1 <- weights_calc(numerator1=real1, denominator=sum(real1))
   
@@ -92,9 +92,6 @@ sim <- function(sampling='weighted', model_weights=T,
     random_weighted <- c(weighted, random)
   }
   
-  
-  #-------------------------------#
-  
   # inverse weights for sample
   if(sampling=='random'){
     inv.weights <- rep(1/n.random, n.random)
@@ -130,10 +127,9 @@ sim <- function(sampling='weighted', model_weights=T,
     itype2 <- 1
   }
   
-  #----------------------------------#
-  # JAGS
+  #--------------- Bayesian model -------------------#
   
-  # data
+  # jags data
   jd <- list(n = length(y),
              y = y,
              a = 1,
@@ -180,7 +176,7 @@ sim <- function(sampling='weighted', model_weights=T,
   jm$seed <- 42
   saveRDS(jm, paste0(outdir,'jm.rds'))
   
-  # check traceplots
+  # traceplots
   pdf(paste0(outdir,'trace.pdf'))
   if(ntype==2) {
     traceplot(jm$mcmc[,c(paste0('med[',1:2,']'),paste0('log_sigma[',1:2,']'),paste0('SIGMA[',1:2,']'))])
@@ -195,100 +191,13 @@ sim <- function(sampling='weighted', model_weights=T,
     d <- rbind(d, jm$mcmc[[i]])
   }
   
-  # posterior for pop totals
+  # posterior pop totals
   for(t in 1:jd$ntype){
     d[,paste0('poptotal[',t,']')] <- apply(d, 1, totalpop, jd, t)
   }
   
   # save to disk
   write.csv(d, file=paste0(outdir,'d.csv'), row.names=F)
-  
-  # #-----------------------------------------------#
-  # 
-  # jpeg(paste0(outdir,'model.jpg'))
-  # if(ntype==2){
-  #   # yhat predictions
-  #   yhat1 <- d$`yhat[1]`
-  #   yhat2 <- d$`yhat[2]`
-  #   
-  #   # plot densities
-  #   density_y1 <- density(jd$y[jd$type==1])
-  #   density_y2 <- density(jd$y[jd$type==2])
-  #   
-  #   density_real1 <- density(real1)
-  #   density_real2 <- density(real2)
-  #   
-  #   density_yhat1 <- density(yhat1)
-  #   density_yhat2 <- density(yhat2)
-  #   
-  #   xlim <- c(0, quantile(real, probs=0.99))
-  #   ylim <- c(0, max(density_y1$y, density_y2$y, density_real1$y, density_real2$y, density_yhat1$y, density_yhat2$y))
-  #   
-  #   plot(NA, xlim=xlim, ylim=ylim, xlab='Population', ylab='Probability')
-  #   
-  #   lines(density_real1, col='gray', lwd=2, lty=2)
-  #   lines(density_real2, col='gray', lwd=2, lty=2)
-  #   
-  #   lines(density_yhat1, col='black', lwd=2, lty=1)
-  #   lines(density_yhat2, col='black', lwd=2, lty=1)
-  # 
-  #   lines(density_y1, col='black', lwd=2, lty=3)
-  #   lines(density_y2, col='black', lwd=2, lty=3)
-  #   
-  # } else {
-  #   
-  #   # yhat predictions
-  #   yhat1 <- d$yhat
-  #   
-  #   # plot densities
-  #   density_real1 <- density(real1)
-  #   
-  #   density_y <- density(jd$y)
-  #   
-  #   density_yhat1 <- density(yhat1)
-  #   
-  #   xlim <- c(0, quantile(real, probs=0.99))
-  #   ylim <- c(0, max(density_y$y, density_real1$y, density_yhat1$y))
-  #   
-  #   plot(NA, xlim=xlim, ylim=ylim, xlab='Population',ylab='Probability')
-  #   
-  #   lines(density_real1, col='gray', lwd=2, lty=2)
-  #   lines(density_yhat1, col='black', lwd=2, lty=1)
-  #   lines(density_y, col='black', lwd=2, lty=3)
-  # }
-  # 
-  # legend('topright', legend=c('True','Estimated','Sample'),
-  #        col=c('gray','black','black'),
-  #        lwd=c(2,2,2),
-  #        lty=c(2,1,3))
-  # 
-  # dev.off()
-  # 
-  # #-----------------------------------#
-  # 
-  # jpeg(paste0(outdir,'totals.jpg'))
-  # 
-  # if(ntype==1){
-  #   total1 <- sum(rlnorm(n.real1, log(mean(d$`med`)), mean(d$`LOG_SIGMA[1]`) ) )
-  #   
-  #   barplot(height=matrix(c(sum(real1), total1), ncol=1, byrow=T), 
-  #           beside=T, space=0.1,
-  #           legend.text=c('True','Estimated'),
-  #           main='Population Total')
-  # }
-  # 
-  # if(ntype==2){
-  #   total1 <- sum(rlnorm(n.real1, log(mean(d$`med[1]`)), mean(d$`LOG_SIGMA[1]`) ) )
-  #   total2 <- sum(rlnorm(n.real2, log(mean(d$`med[2]`)), mean(d$`LOG_SIGMA[2]`) ) )
-  #   
-  #   barplot(height=matrix(c(sum(real1), sum(real2), total1, total2), ncol=2, byrow=T), 
-  #           beside=T,
-  #           names=c('Type 1', 'Type 2'),
-  #           legend.text=c('True','Estimated'),
-  #           main='Population Total')
-  # } 
-  #  
-  # dev.off()
   
 }
   

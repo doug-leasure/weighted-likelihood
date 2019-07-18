@@ -38,3 +38,11 @@ LOG_SIGMA[2] == ifelse(ntype==2, log_sigma[2] * length(itype2) / sum( sqrt(w[ity
 for(t in 1:ntype){
   SIGMA[t] <- sqrt( exp( 2 * log(med[t]) + LOG_SIGMA[t]^2 ) * ( exp( LOG_SIGMA[t]^2 ) - 1 ) )
 }
+
+
+##------ drc pop vs weights ------##
+jd <- readRDS('out/drc/combined/jd.rds')
+
+plot(jd$w ~ jd$y, main='Weighted Sample', xlab='Population', ylab='Model Weight')
+plot(jd$w ~ jd$y, main='Weighted Sample', xlab='Population', ylab='Model Weight', ylim=c(0,0.04))
+plot(jd$w ~ jd$y, main='Weighted Sample', xlab='Population', ylab='Model Weight', xlim=c(0,1000))

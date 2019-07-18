@@ -1,5 +1,5 @@
 # image file
-jpeg('manuscript/figs/sim_model.jpg', res=300, height=6, width=6, units='in')
+jpeg('out/sim_model.jpg', res=300, height=6, width=6, units='in')
 
 # plot function
 source('code/functions/plotModel.R')

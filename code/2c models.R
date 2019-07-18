@@ -5,11 +5,11 @@ outdir <- 'out/drc/'
 source('code/functions/inits.R')
 source('code/functions/totalpop.R')
 
-mods <- c('random','weighted','weighted_naive','all')
+mods <- c('random','weighted','weighted_naive','combined')
 
 for(m in mods){
   # data
-  jd <- readRDS(paste0('out/drc/jd_',m,'.rds'))
+  jd <- readRDS(paste0('out/drc/',m,'/jd.rds'))
   
   # monitor
   par.monitor <- c('med','log_sigma','SIGMA','LOG_SIGMA','yhat')
@@ -43,10 +43,10 @@ for(m in mods){
   )
   jm$init <- init
   jm$seed <- 42
-  saveRDS(jm, paste0(outdir,'jm_',m,'.rds'))
+  saveRDS(jm, paste0(outdir, m, '/jm.rds'))
   
   # check traceplots
-  pdf(paste0(outdir,'trace_',m,'.pdf'))
+  pdf(paste0(outdir, m, '/trace.pdf'))
   traceplot(jm$mcmc[,c(paste0('med[',1:2,']'),paste0('log_sigma[',1:2,']'),paste0('SIGMA[',1:2,']'))])
   dev.off()
   
@@ -62,6 +62,6 @@ for(m in mods){
   }
   
   # save to disk
-  write.csv(d, file=paste0(outdir,'d_',m,'.csv'), row.names=F)
+  write.csv(d, file=paste0(outdir, m, '/d.csv'), row.names=F)
 }
 

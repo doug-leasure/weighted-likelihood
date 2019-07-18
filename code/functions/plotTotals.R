@@ -1,5 +1,6 @@
-plotTotals <- function(bardata, lower, upper, total1=NA, total2=NA, main='Population Totals'){
+plotTotals <- function(bardata, lower, upper, real=NA, main='Population Totals'){
   
+  # bar plot
   bp <- barplot(height=bardata, 
                 main=main,
                 beside=T,
@@ -52,8 +53,15 @@ plotTotals <- function(bardata, lower, upper, total1=NA, total2=NA, main='Popula
   )
   
   # add correct value
-  xcut <- mean(c(bp[4,1], bp[1,2]))
-  if(!is.na(total1)) arrows(x0=0, x1=xcut, y0=total1, y1=total1, length=0, lty=2)
-  if(!is.na(total2)) arrows(x0=xcut, x1=10, y0=total2, y1=total2, length=0, lty=2)
-  
+  if(!is.na(real)) {
+    arrows(x0=bp[1,1]-0.5, x1=bp[1,1]+0.5, y0=real['Random','Urban'], length=0, lty=1, lwd=2)
+    arrows(x0=bp[2,1]-0.5, x1=bp[2,1]+0.5, y0=real['Weighted Unadjusted','Urban'], length=0, lty=1, lwd=2)
+    arrows(x0=bp[3,1]-0.5, x1=bp[3,1]+0.5, y0=real['Weighted Adjusted','Urban'], length=0, lty=1, lwd=2)
+    arrows(x0=bp[4,1]-0.5, x1=bp[4,1]+0.5, y0=real['Combined','Urban'], length=0, lty=1, lwd=2)
+    
+    arrows(x0=bp[1,2]-0.5, x1=bp[1,2]+0.5, y0=real['Random','Rural'], length=0, lty=1, lwd=2)
+    arrows(x0=bp[2,2]-0.5, x1=bp[2,2]+0.5, y0=real['Weighted Unadjusted','Rural'], length=0, lty=1, lwd=2)
+    arrows(x0=bp[3,2]-0.5, x1=bp[3,2]+0.5, y0=real['Weighted Adjusted','Rural'], length=0, lty=1, lwd=2)
+    arrows(x0=bp[4,2]-0.5, x1=bp[4,2]+0.5, y0=real['Combined','Rural'], length=0, lty=1, lwd=2)
+  }
 }
