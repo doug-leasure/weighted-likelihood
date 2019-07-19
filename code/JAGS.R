@@ -1,9 +1,11 @@
 model{
   
+  maxpop <- 2e3
+  
   for(i in 1:n){
     
     # LIKELIHOOD FUNCTION
-    y[i] ~ dlnorm(log(med[type[i]]), log_tau[i])
+    y[i] ~ dlnorm(log(med[type[i]]), log_tau[i]) #T(,maxpop)
     
     # tau[i] = sample-specific estimate of precision (after weighting)
     log_tau[i] <- pow(log_sigma[type[i]],-2) * w[i]
@@ -28,21 +30,15 @@ model{
   for(t in 1:ntype){
     
     # prediction
-    yhat[t] ~ dlnorm(log(med[t]), pow(LOG_SIGMA[t],-2))
+    yhat[t] ~ dlnorm(log(med[t]), pow(LOG_SIGMA[t],-2)) #T(,maxpop)
     
     # NAT_SIGMA = LOG_SIGMA converted to natural scale
     SIGMA[t] <- sqrt( exp( 2 * log(med[t]) + LOG_SIGMA[t]^2 ) * ( exp( LOG_SIGMA[t]^2 ) - 1 ) )
   }
   
-  # # LOG_SIGMA = weighted average of sig among samples
-  # LOG_SIGMA[1] <- sum( log_sig[itype1] * w[itype1] ) / sum( w[itype1] )
-  # LOG_SIGMA[2] <- ifelse(ntype<2, 0, sum( log_sig[itype2] * w[itype2] ) / sum( w[itype2] ))
-
   # LOG_SIGMA = sqrt weighted average of sig among samples
   LOG_SIGMA[1] <- sum( log_sig[itype1] * sqrt(w[itype1]) ) / sum(sqrt( w[itype1] ))
   LOG_SIGMA[2] <- ifelse(ntype<2, 0, sum( log_sig[itype2] * sqrt(w[itype2]) ) / sum( sqrt(w[itype2]) ))
-  
-  
 }
 
 

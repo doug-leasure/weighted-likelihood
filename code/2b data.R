@@ -63,8 +63,8 @@ master_df <- master_df %>%  mutate(weight_scaled=weight/sum(master_df$weight))
 # remove outliers in weights (n=2)
 master_df <- master_df[master_df$weight_scaled < 0.02, ]
 
-# remove outliers in density (n=2; likely errors in settled area)
-master_df <- master_df[master_df$pop_density < 1000,]
+# # remove outliers in density (n=2; likely errors in settled area)
+# master_df <- master_df[master_df$pop_density < 1000,]
 
 # settlement areas
 urban_pixels <- 48347

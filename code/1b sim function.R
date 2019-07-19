@@ -36,12 +36,12 @@ sim <- function(sampling='weighted', model_weights=T,
   
   log_sigma1 <- sig_to_log(med1, sigma1)
   
-  real <- real1 <- rlnorm(n.real1, log(med1), log_sigma1)
+  real <- real1 <- rlnorm_trunc(n.real1, log(med1), log_sigma1)
   
   if(ntype==2) {
     log_sigma2 <- sig_to_log(med2, sigma2)
     
-    real2 <- rlnorm(n.real2, log(med2), log_sigma2)
+    real2 <- rlnorm_trunc(n.real2, log(med2), log_sigma2)
     real2 <- real2[!real2 %in% real1]
     
     real <- c(real1, real2)

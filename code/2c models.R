@@ -8,6 +8,8 @@ source('code/functions/totalpop.R')
 mods <- c('random','weighted','weighted_naive','combined')
 
 for(m in mods){
+  print(paste0('#====== ',m,' ======#'))
+  
   # data
   jd <- readRDS(paste0('out/drc/',m,'/jd.rds'))
   

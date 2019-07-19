@@ -12,6 +12,10 @@ library(dplyr); library(sf); library(reshape2); library(tidyr); library(purrr); 
 # working directory
 setwd('C:/RESEARCH/2018 GRID3 WorldPop/git/wpgp/weighted-likelihood')
 
+# source functions
+funs <- list.files('code/functions') 
+for(fun in funs) source(paste0('code/functions/',fun))
+
 # create directories
 dir.create('out', showWarnings=F)
 dir.create('out/drc', showWarnings=F)

@@ -44,10 +44,10 @@ plotModel(jd=readRDS('out/sims/weighted_naive/jd.rds'),
 
 
 # panel 4: weighted adjusted
-plotModel(jd=readRDS('out/sims/combined/jd.rds'),
-             d=read.csv('out/sims/combined/d.csv', check.names=F),
-             real1=readRDS('out/sims/combined/real1.rds'),
-             real2=readRDS('out/sims/combined/real2.rds'),
+plotModel(jd=readRDS('out/sims/weighted/jd.rds'),
+             d=read.csv('out/sims/weighted/d.csv', check.names=F),
+             real1=readRDS('out/sims/weighted/real1.rds'),
+             real2=readRDS('out/sims/weighted/real2.rds'),
              mar=c(4.5, 0.5, 0.5, 1),
              xlab='Population Density',
              main='Weighted\nAdjusted',
