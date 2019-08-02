@@ -9,9 +9,9 @@ setwd('C:/RESEARCH/2018 GRID3 WorldPop/git/wpgp/weighted-likelihood')
 
 # source directory
 if(.Platform$OS.type=="unix"){
-  srcdir <- '/Volumes/worldpop/Projects/WP517763_GRID3/Working/COD/made/drl/weighted-likelihood/in/'
+  srcdir <- '/Volumes/worldpop/Projects/WP517763_GRID3/Working/weighted-likelihood/in/'
 } else {
-  srcdir <- '//worldpop.files.soton.ac.uk/worldpop/Projects/WP517763_GRID3/Working/COD/made/drl/weighted-likelihood/in'
+  srcdir <- '//worldpop.files.soton.ac.uk/worldpop/Projects/WP517763_GRID3/Working/weighted-likelihood/in'
 }
 # copy source
 file.copy(from=srcdir, to=getwd(), overwrite=T, recursive=T)
