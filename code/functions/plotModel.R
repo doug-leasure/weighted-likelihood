@@ -1,25 +1,25 @@
 plotModel <- function(jd, d, real1=NA, real2=NA, 
                          mar=c(4.5,2.5,1,1), legend=F,
-                         xlab=NA, xaxt='s',
+                         xlab=NA, xaxt='s', max.x = 1000,
                          main=NA, line.main=-1.5, adj.main=0.5){
   par(mar=mar)
   
   # densities
-  density_y1 <- density(jd$y[jd$type==1], from=0, to=1000)
-  density_y2 <- density(jd$y[jd$type==2], from=0, to=1000)
+  density_y1 <- density(jd$y[jd$type==1], from=0, to=max.x)
+  density_y2 <- density(jd$y[jd$type==2], from=0, to=max.x)
   
-  if(!is.na(real1)) density_real1 <- density(real1, from=0, to=1000)
-  if(!is.na(real2)) density_real2 <- density(real2, from=0, to=1000)
+  if(!is.na(real1)) density_real1 <- density(real1, from=0, to=max.x)
+  if(!is.na(real2)) density_real2 <- density(real2, from=0, to=max.x)
   
-  density_yhat1 <- density(d$`yhat[1]`, from=0, to=1000)
-  density_yhat2 <- density(d$`yhat[2]`, from=0, to=1000)
+  density_yhat1 <- density(d$`yhat[1]`, from=0, to=max.x)
+  density_yhat2 <- density(d$`yhat[2]`, from=0, to=max.x)
   
   #gray level
   g1 <- 0.6
   g2 <- 0.4
   
   # plot
-  xlim <- c(0, 1e3)
+  xlim <- c(0, max.x)
   ylim <- c(0, max(density_y1$y, density_y2$y, density_yhat1$y, density_yhat2$y))
   
   if(!is.na(real1)) ylim[2] <- max(ylim[2], max(density_real1$y))
