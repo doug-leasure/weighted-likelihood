@@ -11,6 +11,7 @@ library(runjags);library(boot);library(rjags);library(mcmc)
 
 # working directory
 setwd('C:/RESEARCH/2018 GRID3 WorldPop/git/wpgp/weighted-likelihood')
+# setwd('//filestore.soton.ac.uk/users/cad1c14/mydocuments/GitHub/weighted-likelihood')
 
 # create directories
 dir.create('out', showWarnings=F)

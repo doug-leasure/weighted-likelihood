@@ -1,7 +1,6 @@
 
 # read in data
-#clusters <- read.csv("Z:/Projects/WP517763_GRID3/Working/weighted-likelihood/in/zmb_smglsurvey_clusters.csv")
-clusters <- read.csv("//filestore.soton.ac.uk/users/cad1c14/mydocuments/GitHub//weighted-likelihood/in/zmb_smglsurvey_clusters.csv")
+clusters <- read.csv("in/zmb_smglsurvey_clusters.csv")
 
 
 # total clusters = 1735
