@@ -60,7 +60,7 @@ for(m in mods){
   
   # posterior for pop totals
   for(t in 1:jd$ntype){
-    d[,paste0('poptotal[',t,']')] <- apply(d, 1, totalpop, jd, t)
+    d[,paste0('poptotal[',t,']')] <- apply(d, 1, totalpop, jd, type = t, maxpop = 800)
   }
   
   # save to disk

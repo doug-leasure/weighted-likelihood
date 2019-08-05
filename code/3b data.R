@@ -50,6 +50,10 @@ inv.w.random <- weights_calc(w.random,sum(w.random))
 w.combined <- weights_calc(c(r.weights,u.weights,w.random),length(c(r.weights,u.weights,w.random)),inverse=T)
 ######## not sure if this is the same as doing the numerator2, I know this way will work ######
 
+NApad <- length(r.clusters$sett_area) - length(u.clusters$sett_area)
+#areas <- cbind(c(u.clusters$sett_area, rep(NA, NApad)),r.clusters$sett_area)
+areas <- 1
+
 # jags data random
 
 jd_random <- list(id = random_clusters,
@@ -63,7 +67,7 @@ jd_random <- list(id = random_clusters,
                   itype2 = 1:n.rural.random,
                   itype1 = (n.rural.random+1):(n.rural.random + n.urban.random),
                   
-                  a = 1,
+                  a = areas,
                   ntotal = c(nrow(u.clusters),nrow(r.clusters))
 )
 
@@ -81,7 +85,7 @@ jd_weighted <- list(id = weighted_clusters,
                     itype2 = 1:n.rural.weighted,
                     itype1 = (n.rural.weighted+1):(n.rural.weighted + n.urban.weighted),
                     
-                    a = 1,
+                    a = areas,
                     ntotal = c(nrow(u.clusters),nrow(r.clusters)) 
 )
 
@@ -97,7 +101,7 @@ jd_weighted_naive <- list(id = weighted_clusters,
                           itype2 = 1:n.rural.weighted,
                           itype1 = (n.rural.weighted+1):(n.rural.weighted + n.urban.weighted),
                           
-                          a = 1,
+                          a = areas,
                           ntotal = c(nrow(u.clusters),nrow(r.clusters)) 
 )
 
@@ -115,7 +119,7 @@ jd_all <- list(id = c(weighted_clusters, random_clusters),
                itype2 = c(1:n.rural.weighted, (n.rural.weighted + n.urban.weighted + 1):(n.rural.weighted + n.urban.weighted + n.rural.random)),
                itype1 = c((n.rural.weighted+1):(n.rural.weighted + n.urban.weighted) , (n.rural.weighted + n.urban.weighted + n.rural.random + 1):(n.rural.weighted + n.urban.weighted + n.rural.random + n.urban.random)),
                
-               a = 1,
+               a = areas,
                ntotal = c(nrow(u.clusters),nrow(r.clusters)) 
 )
 

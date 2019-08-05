@@ -9,6 +9,8 @@ d_random <- read.csv('out/zmb/random/d.csv', check.names=F)
 d_weighted <- read.csv('out/zmb/weighted/d.csv', check.names=F)
 d_weighted_naive <- read.csv('out/zmb/weighted_naive/d.csv', check.names=F)
 d_combined <- read.csv('out/zmb/combined/d.csv', check.names=F)
+clusters <- read.csv("in/zmb_smglsurvey_clusters.csv")
+
 
 # prepare output data
 totals <- upper <- lower <- data.frame(Urban=rep(NA, 4),
@@ -49,11 +51,20 @@ lower['Weighted Unadjusted','Rural'] <- quantile(d_weighted_naive$`poptotal[2]`,
 lower['Weighted Adjusted','Rural'] <- quantile(d_weighted$`poptotal[2]`, probs=c(0.025))
 lower['Combined','Rural'] <- quantile(d_combined$`poptotal[2]`, probs=c(0.025))
 
+#real <- matrix(rep(c(sum(clusters$N[clusters$REGION == 'Urban']),sum(clusters$N[clusters$REGION == 'Rural'])),each=4),byrow=F,ncol=2)
+real <- matrix(rep(c(sum(clusters$pop_dens[clusters$REGION == 'Urban']),sum(clusters$pop_dens[clusters$REGION == 'Rural'])),each=4),byrow=F,ncol=2)
+
+  
+rownames(real) <- c('Random','Weighted Unadjusted','Weighted Adjusted','Combined')
+colnames(real) <- c('Urban','Rural')
+  
 # plot
 plotTotals(main='Zambia Six Regions Population Totals',
            bardata = as.matrix(totals), 
            lower = lower, 
-           upper = upper
+           upper = upper,
+           real = real,
+           pos.legend='topleft'
 )
 dev.off()
 

@@ -13,7 +13,7 @@ plotModel(jd=readRDS('out/zmb/random/jd.rds'),
           mar=c(0.5, 1, 1, 0.5),
           main='Random',
           xaxt='n',
-          max.x = 500,
+          max.x = 300,
           legend=T,
           adj.main=0.3
 )
@@ -23,7 +23,7 @@ plotModel(jd=readRDS('out/zmb/combined/jd.rds'),
           d=read.csv('out/zmb/combined/d.csv', check.names=F),
           mar=c(4.5, 1, 0.5, 0.5),
           xlab='Population Density',
-          max.x = 500,
+          max.x = 300,
           main='Combined'
 )
 
@@ -35,7 +35,7 @@ plotModel(jd=readRDS('out/zmb/weighted_naive/jd.rds'),
           xlab='Population Density',
           main='Weighted\nUnadjusted',
           line.main=-2.5,
-          max.x = 500,
+          max.x = 300,
           xaxt='n'
 )
 
@@ -46,7 +46,7 @@ plotModel(jd=readRDS('out/zmb/weighted/jd.rds'),
           mar=c(4.5, 0.5, 0.5, 1),
           xlab='Population Density',
           main='Weighted\nAdjusted',
-          max.x = 500,
+          max.x = 300,
           line.main=-2.5
 )
 

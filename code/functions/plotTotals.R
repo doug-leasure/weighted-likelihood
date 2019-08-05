@@ -1,4 +1,4 @@
-plotTotals <- function(bardata, lower, upper, real=NA, main='Population Totals'){
+plotTotals <- function(bardata, lower, upper, pos.legend = 'topright',real=NA, main='Population Totals'){
   
   # bar plot
   bp <- barplot(height=bardata, 
@@ -8,7 +8,7 @@ plotTotals <- function(bardata, lower, upper, real=NA, main='Population Totals')
                 ylim=c(0,max(upper)),
                 ylab='Population Total',
                 legend.text=T,
-                args.legend=list(x='topright', bty='n'))
+                args.legend=list(x=pos.legend, bty='n'))
   
   # add error bars
   arrows(x0=bp[1,1], x1=bp[1,1],
