@@ -19,23 +19,23 @@ for(fun in funs) source(paste0('code/functions/',fun))
 
 # create directories
 dir.create('out', showWarnings=F)
-dir.create('out/zmb', showWarnings=F)
-dir.create('out/zmb/random', showWarnings=F)
-dir.create('out/zmb/weighted_naive', showWarnings=F)
-dir.create('out/zmb/weighted', showWarnings=F)
-dir.create('out/zmb/combined', showWarnings=F)
+dir.create('out/zmb_with_areas', showWarnings=F)
+dir.create('out/zmb_with_areas/random', showWarnings=F)
+dir.create('out/zmb_with_areas/weighted_naive', showWarnings=F)
+dir.create('out/zmb_with_areas/weighted', showWarnings=F)
+dir.create('out/zmb_with_areas/combined', showWarnings=F)
 
 # data
-source('code/3b data.R')
+source('code/3b data with areas.R')
 
 # fit models
-source('code/3c models.R')
+source('code/3c models with areas.R')
 
 # plot models
-source('code/3d plot model.R')
+source('code/3d plot model with areas.R')
 
 # plot totals
-source('code/3e plot totals.R')
+source('code/3e plot totals with areas.R')
 
 
 
