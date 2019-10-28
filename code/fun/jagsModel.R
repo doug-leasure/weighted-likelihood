@@ -1,17 +1,10 @@
-# output directory
-outdir <- 'out/zmb/'
-
-# initials function
-source('code/functions/inits.R')
-source('code/functions/totalpop.R')
-
-mods <- c('random','weighted','weighted_naive','combined')
-
-for(m in mods){
-  print(paste0('#====== ',m,' ======#'))
+jagsModel <- function(dir, areaAdjust=F){
   
   # data
-  jd <- readRDS(paste0('out/zmb/',m,'/jd.rds'))
+  jd <- readRDS(paste0(dir,'jd.rds'))
+  
+  # set seed
+  set.seed(jd$seed)
   
   # monitor
   par.monitor <- c('med','log_sigma','SIGMA','LOG_SIGMA','yhat')
@@ -27,7 +20,7 @@ for(m in mods){
   thin <- 1
   n.chains <- 3
   
-  init <- inits(n.chains, jd)
+  init <- inits(jd, n.chains)
   
   # run jags
   jm <- run.jags(model='code/JAGS.R', 
@@ -44,11 +37,11 @@ for(m in mods){
                  method='parallel' #'rjags' #'rjparallel'
   )
   jm$init <- init
-  jm$seed <- 42
-  saveRDS(jm, paste0(outdir, m, '/jm.rds'))
+  jm$seed <- jd$seed
+  saveRDS(jm, paste0(dir, 'jm.rds'))
   
   # check traceplots
-  pdf(paste0(outdir, m, '/trace.pdf'))
+  pdf(paste0(dir, '/trace.pdf'))
   traceplot(jm$mcmc[,c(paste0('med[',1:2,']'),paste0('log_sigma[',1:2,']'),paste0('SIGMA[',1:2,']'))])
   dev.off()
   
@@ -60,10 +53,14 @@ for(m in mods){
   
   # posterior for pop totals
   for(t in 1:jd$ntype){
-    d[,paste0('poptotal[',t,']')] <- apply(d, 1, totalpop, jd, type = t, maxpop = 800)
-  }
+    d[,paste0('poptotal[',t,']')] <- apply(X=d, 
+                                           MARGIN=1, 
+                                           FUN=totalpop, 
+                                           jd=jd, 
+                                           type=t,
+                                           areaAdjust=areaAdjust)
+    }
   
   # save to disk
-  write.csv(d, file=paste0(outdir, m, '/d.csv'), row.names=F)
+  write.csv(d, file=paste0(dir, 'd.csv'), row.names=F)
 }
-

@@ -4,35 +4,50 @@ gc()
 cat("\014") 
 try(dev.off())
 
-set.seed(42)
+# seed
+seed <- runif(1, 0, 42)
+set.seed(seed)
 
-# load packages
-library(rjags); library(dplyr); library(sf); library(reshape2); library(tidyr); library(purrr); library(svDialogs)
+# packages
+library(rjags); 
+library(dplyr); library(sf); library(reshape2); library(tidyr); library(purrr); library(svDialogs);
+library(raster); library(rgdal); library(rgeos); library(tmap); library(tcltk2)
 
 # working directory
-setwd('C:/RESEARCH/2018 GRID3 WorldPop/git/wpgp/weighted-likelihood')
+setwd('C:/RESEARCH/git/wpgp/weighted-likelihood')
 # setwd('//filestore.soton.ac.uk/users/cad1c14/mydocuments/GitHub/weighted-likelihood')
 
 # source functions
-funs <- list.files('code/functions') 
-for(fun in funs) source(paste0('code/functions/',fun))
+for(i in list.files('code/fun') ) source(paste0('code/fun/',i))
 
 # create directories
-dir.create('out', showWarnings=F)
-dir.create('out/drc', showWarnings=F)
-dir.create('out/drc/random', showWarnings=F)
-dir.create('out/drc/weighted_naive', showWarnings=F)
-dir.create('out/drc/weighted', showWarnings=F)
-dir.create('out/drc/combined', showWarnings=F)
+outdir <- 'out/drc/'
+dir.create(outdir, showWarnings=F)
+
+sims <- c('random','weighted_naive','weighted','combined')
+for(i in sims){
+  dir.create(paste0(outdir,i), showWarnings=F)
+}
 
 # data
-source('code/2b data.R')
+dataDRC(indir='in/', outdir, seed=seed)
 
 # fit models
-source('code/2c models.R')
-
+for(i in sims){
+  jagsModel(paste0(outdir,i,'/'))
+}
+    
 # plot models
-source('code/2d plot model.R')
+plotModelPanel(file=paste0(outdir,'drc_model.jpg'), 
+               sims=sims, 
+               dir=outdir, 
+               plotReal=F)
 
 # plot totals
-source('code/2e plot totals.R')
+plotTotals(dat = plotTotalsData(dir=outdir),
+           file = paste0(outdir,'drc_totals.jpg'),
+           plotReal=F
+           )
+
+# map of kinshasa
+mapKinshasa(paste0(outdir,'kinshasa_sampling.jpg'))

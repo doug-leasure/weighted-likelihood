@@ -4,42 +4,71 @@ gc()
 cat("\014") 
 try(dev.off())
 
-set.seed(42)
+# seed
+seed <- runif(1, 0, 42)
+set.seed(seed)
 
 # load packages
 library(runjags);library(boot);library(rjags);library(mcmc)
 
 # working directory
-setwd('C:/RESEARCH/2018 GRID3 WorldPop/git/wpgp/weighted-likelihood')
+setwd('C:/RESEARCH/git/wpgp/weighted-likelihood')
 # setwd('//filestore.soton.ac.uk/users/cad1c14/mydocuments/GitHub/weighted-likelihood')
+
+# source functions
+for(i in list.files('code/fun') ) source(paste0('code/fun/',i))
 
 # create directories
 dir.create('out', showWarnings=F)
-dir.create('out/sims', showWarnings=F)
 
-# source functions
-funs <- list.files('code/functions') 
-for(fun in funs) source(paste0('code/functions/',fun))
-source('code/1b sim function.R')
+outdir <- 'out/sims/'
+dir.create(outdir, showWarnings=F)
 
-#==== simulations ====#
+# simulation names
+sims <- c('random','weighted_naive','weighted','combined')
 
-# random sampling; two settlement types
-sim(sampling='random', n.random=1000, n.weighted=0, ntype=2, outdir='sims/random')
+# random sampling
+dataSim(sampling='random', 
+        n.random=1000, 
+        n.weighted=0, 
+        outdir=paste0(outdir,sims[1],'/'),
+        seed=seed)
 
-# weighted sampling; two settlement types; no model weights
-sim(sampling='weighted', n.random=0, n.weighted=1000, ntype=2, model_weights=F, outdir='sims/weighted_naive')
+# weighted sampling, no model weights
+dataSim(sampling='weighted', 
+        n.random=0, 
+        n.weighted=1000, 
+        model_weights=F, 
+        outdir=paste0(outdir,sims[2],'/'),
+        seed=seed)
 
-# weighted sampling; two settlement types; with model weights
-sim(sampling='weighted', n.random=0, n.weighted=1000, ntype=2, outdir='sims/weighted')
+# weighted sampling, with model weights
+dataSim(sampling='weighted', 
+        n.random=0, 
+        n.weighted=1000, 
+        outdir=paste0(outdir,sims[3],'/'),
+        seed=seed)
 
-# random sampling and weighted sampling; two settlement types; with model weights
-sim(sampling='combined', n.random=500, n.weighted=500, ntype=2, outdir='sims/combined')
+# random sampling and weighted sampling, with model weights
+dataSim(sampling='combined', 
+        n.random=500, 
+        n.weighted=500, 
+        outdir=paste0(outdir,sims[4],'/'),
+        seed=seed)
 
-#======= plots =====#
+# fit models
+for(i in sims){
+  jagsModel(paste0(outdir,i,'/'))
+}
 
 # plot (4 panel) of data and model
-source('code/1c plot model.R')
+plotModelPanel(file=paste0(outdir,'sim_model.jpg'), 
+               sims=sims, 
+               dir=outdir, 
+               plotReal=T)
 
 # plot of population totals for each model
-source('code/1d plot totals.R')
+plotTotals(dat = plotTotalsData(dir=outdir, plotReal=T),
+           file = paste0(outdir,'sim_totals.jpg'),
+           plotReal=T
+           )

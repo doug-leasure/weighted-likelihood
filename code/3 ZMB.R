@@ -4,38 +4,65 @@ gc()
 cat("\014") 
 try(dev.off())
 
-set.seed(42)
+# seed
+seed <- runif(1, 0, 42)
+set.seed(seed)
 
-# load packages
+# packages
 library(runjags); library(rjags); library(dplyr); library(sf); library(reshape2); library(tidyr); library(purrr); library(svDialogs)
 
 # working directory
-# setwd('C:/RESEARCH/2018 GRID3 WorldPop/git/wpgp/weighted-likelihood')
-setwd('//filestore.soton.ac.uk/users/cad1c14/mydocuments/GitHub/weighted-likelihood')
+setwd('C:/RESEARCH/git/wpgp/weighted-likelihood')
+# setwd('//filestore.soton.ac.uk/users/cad1c14/mydocuments/GitHub/weighted-likelihood')
 
-# source functions
-funs <- list.files('code/functions') 
-for(fun in funs) source(paste0('code/functions/',fun))
+# simulation names
+sims <- c('random','weighted_naive','weighted','combined')
 
-# create directories
-dir.create('out', showWarnings=F)
-dir.create('out/zmb', showWarnings=F)
-dir.create('out/zmb/random', showWarnings=F)
-dir.create('out/zmb/weighted_naive', showWarnings=F)
-dir.create('out/zmb/weighted', showWarnings=F)
-dir.create('out/zmb/combined', showWarnings=F)
+# functions
+for(i in list.files('code/fun')) source(paste0('code/fun/',i))
 
-# data
-source('code/3b data.R')
+# settings (with or without adjusting for area)
+settings <- list()
+settings[[1]] <- list(outdir='out/zmb/', areaAdjust=F)
+settings[[2]] <- list(outdir='out/zmb_with_areas/', areaAdjust=T)
 
-# fit models
-source('code/3c models.R')
+for(setting in settings){
+  
+  # output directory
+  outdir <- setting$outdir
+  
+  # adjust for areas?
+  areaAdjust <- setting$areaAdjust
+  
+  # create directories
+  dir.create('out', showWarnings=F)
+  dir.create(outdir, showWarnings=F)
+  for(i in sims){
+    dir.create(paste0(outdir,i), showWarnings=F)
+  }
+  
+  # data
+  dataZMB(indir='in/', outdir=outdir, areaAdjust=areaAdjust, seed=seed)
+  
+  # fit models
+  for(i in sims){
+    jagsModel(paste0(outdir,i,'/'), areaAdjust=areaAdjust)
+  }
+  
+  # plot models
+  plotModelPanel(file=paste0(outdir,'zmb_model.jpg'), 
+                 sims=sims, 
+                 dir=outdir, 
+                 plotReal=F,
+                 xmax=300)
+  
+  # plot totals
+  plotTotals(dat = plotTotalsData(dir=outdir),
+             file = paste0(outdir,'zmb_totals.jpg'),
+             pos.legend='topleft'
+  )
+}
 
-# plot models
-source('code/3d plot model.R')
-
-# plot totals
-source('code/3e plot totals.R')
 
 
 
