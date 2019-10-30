@@ -1,13 +1,17 @@
-jagsModel <- function(dir, areaAdjust=F){
+jagsModel <- function(dir, toggleCov=T){
   
   # data
   jd <- readRDS(paste0(dir,'jd.rds'))
+  
+  jd$toggleCov <- as.numeric(toggleCov)
   
   # set seed
   set.seed(jd$seed)
   
   # monitor
-  par.monitor <- c('med','log_sigma','SIGMA','LOG_SIGMA','yhat')
+  par.monitor <- c('alpha','beta','log_sigma','SIGMA','LOG_SIGMA','yhat')
+  
+  if(jd$toggleCov==0) par.monitor <- par.monitor[-which(par.monitor=='beta')]
   
   # modules
   load.module('lecuyer')
@@ -42,7 +46,7 @@ jagsModel <- function(dir, areaAdjust=F){
   
   # check traceplots
   pdf(paste0(dir, '/trace.pdf'))
-  traceplot(jm$mcmc[,c(paste0('med[',1:2,']'),paste0('log_sigma[',1:2,']'),paste0('SIGMA[',1:2,']'))])
+  traceplot(jm$mcmc[,c(paste0('alpha[',1:2,']'),paste0('log_sigma[',1:2,']'),paste0('SIGMA[',1:2,']'))])
   dev.off()
   
   # mcmc.list to data.frame
@@ -51,16 +55,17 @@ jagsModel <- function(dir, areaAdjust=F){
     d <- rbind(d, jm$mcmc[[i]])
   }
   
-  # posterior for pop totals
-  for(t in 1:jd$ntype){
-    d[,paste0('poptotal[',t,']')] <- apply(X=d, 
-                                           MARGIN=1, 
-                                           FUN=totalpop, 
-                                           jd=jd, 
-                                           type=t,
-                                           areaAdjust=areaAdjust)
-    }
+  # derive posterior for pop totals
+  for(t in 1:2){
+    print(paste0('Calculate type ',t,' population total'))
+    
+    sim <- readRDS(paste0(dir,'sim',t,'.rds'))
+    
+    yhat <- predPopLoop(sim=sim, d=d, t=t)
+    
+    d[,paste0('poptotal[',t,']')] <- apply(yhat, 1, sum)
+  }
   
   # save to disk
-  write.csv(d, file=paste0(dir, 'd.csv'), row.names=F)
+  saveRDS(d, file=paste0(dir, 'd.rds'))
 }

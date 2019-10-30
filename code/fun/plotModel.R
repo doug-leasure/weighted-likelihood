@@ -1,6 +1,6 @@
 plotModel <- function(jd, d, real1=NA, real2=NA, 
                          mar=c(4.5,2.5,1,1), legend=F,
-                         xlab=NA, xaxt='s', xmax = 1000,
+                         xlab=NA, xaxt='s', xmax=1e3,
                          main=NA, line.main=-1.5, adj.main=0.5){
   par(mar=mar)
   
@@ -11,8 +11,8 @@ plotModel <- function(jd, d, real1=NA, real2=NA,
   if(length(real1)>1) density_real1 <- density(real1, from=0, to=xmax)
   if(length(real2)>1) density_real2 <- density(real2, from=0, to=xmax)
   
-  density_yhat1 <- density(d$`yhat[1]`, from=0, to=xmax)
-  density_yhat2 <- density(d$`yhat[2]`, from=0, to=xmax)
+  density_yhat1 <- density(as.matrix(d[,paste0('yhat[',jd$itype1,']')]), from=0, to=xmax)
+  density_yhat2 <- density(as.matrix(d[,paste0('yhat[',jd$itype2,']')]), from=0, to=xmax)
   
   #gray level
   g1 <- 0.6

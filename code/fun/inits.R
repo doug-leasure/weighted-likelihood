@@ -5,7 +5,9 @@ inits <- function(dat, chains=3){
   for (c in 1:chains){
     inits.i <- list()
     
-    inits.i$med <- runif(2, 50, 500)
+    inits.i$alpha <- log(runif(2, 50, 500))
+    inits.i$beta <- runif(1, -0.1, 0.1)
+    inits.i$log_sigma <- runif(2, 0.01, 0.1)
     
     # LOG_SIGMA <- runif(1, 0.1, 1.5)
     # inits.i$log_sigma[1:dat$ntype] <- rep(sqrt(1/mean((1/LOG_SIGMA^2) / dat$w)), dat$ntype)

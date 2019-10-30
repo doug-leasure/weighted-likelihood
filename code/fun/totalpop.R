@@ -13,6 +13,7 @@ totalpop <- function(x, jd, type, maxpop=Inf, areaAdjust=F){
   }
     
   total <- sum(a * popdens)
+  
   return(total)
 }
 

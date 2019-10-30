@@ -1,4 +1,4 @@
-dataZMB <- function(indir='in/', outdir='out/zmb/', areaAdjust=F, seed=42){
+dataZMB <- function(indir='in/', outdir='out/zmb/', area=F, seed=42){
   set.seed(seed)
   
   # read in data
@@ -14,6 +14,13 @@ dataZMB <- function(indir='in/', outdir='out/zmb/', areaAdjust=F, seed=42){
   # sample weights
   r.clusters <- clusters[clusters$REGION == "Rural",]
   u.clusters <- clusters[clusters$REGION == "Urban",]
+  
+  for(i in c('random','weighted_naive','weighted','combined')){
+    saveRDS(u.clusters$N, paste0(outdir,i,'/real1.rds'))
+    saveRDS(r.clusters$N, paste0(outdir,i,'/real2.rds'))
+    saveRDS(u.clusters$sett_area, paste0(outdir,i,'/area1.rds'))
+    saveRDS(r.clusters$sett_area, paste0(outdir,i,'/area2.rds'))
+  }
   
   r.clust <- r.clusters$pop_dens
   u.clust <- u.clusters$pop_dens
@@ -50,8 +57,8 @@ dataZMB <- function(indir='in/', outdir='out/zmb/', areaAdjust=F, seed=42){
   
   NApad <- length(r.clusters$sett_area) - length(u.clusters$sett_area)
   
-  if(areaAdjust){
-    areas <- cbind(c(u.clusters$sett_area, rep(NA, NApad)),r.clusters$sett_area)
+  if(area){
+    areas <- cbind(c(u.clusters$sett_area[order(u.clusters$pop_dens)], rep(NA, NApad)),r.clusters$sett_area[order(r.clusters$pop_dens)])
   } else {
     areas <- 1
   }

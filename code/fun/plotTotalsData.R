@@ -2,16 +2,16 @@ plotTotalsData <- function(dir, alpha=0.05, plotReal=F){
   
   # sims
   names <- c('random','weighted_naive','weighted','combined')
-  sims <- paste0(outdir, names)
+  sims <- paste0(dir, names)
 
   # load data
   d <- real1 <- real2 <- list()
   for(i in 1:length(names)){
-    d[[names[i]]] <- read.csv(paste0(sims[i],'/d.csv'), check.names=F)
+    d[[names[i]]] <- readRDS(paste0(sims[i],'/d.rds'))
     
     if(plotReal){
-      real1[[names[i]]] <- readRDS(paste0(sims[i],'/real1.rds'))
-      real2[[names[i]]] <- readRDS(paste0(sims[i],'/real2.rds')) 
+      real1[[names[i]]] <- readRDS(paste0(sims[i],'/sim1.rds'))$N
+      real2[[names[i]]] <- readRDS(paste0(sims[i],'/sim2.rds'))$N
     }
   }
   

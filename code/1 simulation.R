@@ -21,54 +21,58 @@ for(i in list.files('code/fun') ) source(paste0('code/fun/',i))
 # create directories
 dir.create('out', showWarnings=F)
 
-outdir <- 'out/sims/'
-dir.create(outdir, showWarnings=F)
-
-# simulation names
-sims <- c('random','weighted_naive','weighted','combined')
-
-# random sampling
-dataSim(sampling='random', 
-        n.random=1000, 
-        n.weighted=0, 
-        outdir=paste0(outdir,sims[1],'/'),
-        seed=seed)
-
-# weighted sampling, no model weights
-dataSim(sampling='weighted', 
-        n.random=0, 
-        n.weighted=1000, 
-        model_weights=F, 
-        outdir=paste0(outdir,sims[2],'/'),
-        seed=seed)
-
-# weighted sampling, with model weights
-dataSim(sampling='weighted', 
-        n.random=0, 
-        n.weighted=1000, 
-        outdir=paste0(outdir,sims[3],'/'),
-        seed=seed)
-
-# random sampling and weighted sampling, with model weights
-dataSim(sampling='combined', 
-        n.random=500, 
-        n.weighted=500, 
-        outdir=paste0(outdir,sims[4],'/'),
-        seed=seed)
-
-# fit models
-for(i in sims){
-  jagsModel(paste0(outdir,i,'/'))
+for(toggleCov in 0:1){
+  
+  outdir <- paste0('out/sims_cov',toggleCov,'/')
+  dir.create(outdir, showWarnings=F)
+  
+  # simulation names
+  sims <- c('random','weighted_naive','weighted','combined')
+  
+  # random sampling
+  dataSim(sampling='random', 
+          n.random=1000, 
+          n.weighted=0, 
+          outdir=paste0(outdir,sims[1],'/'),
+          seed=seed)
+  
+  # weighted sampling, no model weights
+  dataSim(sampling='weighted', 
+          n.random=0, 
+          n.weighted=1000, 
+          model_weights=F, 
+          outdir=paste0(outdir,sims[2],'/'),
+          seed=seed)
+  
+  # weighted sampling, with model weights
+  dataSim(sampling='weighted', 
+          n.random=0, 
+          n.weighted=1000, 
+          outdir=paste0(outdir,sims[3],'/'),
+          seed=seed)
+  
+  # random sampling and weighted sampling, with model weights
+  dataSim(sampling='combined', 
+          n.random=500, 
+          n.weighted=500, 
+          outdir=paste0(outdir,sims[4],'/'),
+          seed=seed)
+  
+  # fit models
+  for(i in sims){
+    jagsModel(paste0(outdir,i,'/'), toggleCov=toggleCov)
+  }
+  
+  # plot (4 panel) of data and model
+  plotModelPanel(file=paste0(outdir,'sim_model.jpg'), 
+                 sims=sims, 
+                 dir=outdir, 
+                 plotReal=T)
+  
+  # plot of population totals for each model
+  plotTotals(dat = plotTotalsData(dir=outdir, plotReal=T),
+             file = paste0(outdir,'sim_totals.jpg'),
+             plotReal=T
+  )
 }
 
-# plot (4 panel) of data and model
-plotModelPanel(file=paste0(outdir,'sim_model.jpg'), 
-               sims=sims, 
-               dir=outdir, 
-               plotReal=T)
-
-# plot of population totals for each model
-plotTotals(dat = plotTotalsData(dir=outdir, plotReal=T),
-           file = paste0(outdir,'sim_totals.jpg'),
-           plotReal=T
-           )
