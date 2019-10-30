@@ -9,8 +9,8 @@ dataSim <- function(sampling='weighted', model_weights=T,
   dir.create(outdir, showWarnings=F)
   
   # save arguments
-  write.csv(data.frame(argument = c('sampling','n.weighted', 'n.random','type1_prop', 'med1', 'sigma1', 'med2', 'sigma2', 'outdir','seed'),
-                       value = c(sampling, n.weighted, n.random, type1_prop, med1, sigma1, med2, sigma2, outdir, seed)),
+  write.csv(data.frame(argument = c('sampling','n.weighted', 'n.random','type1_prop', 'med1', 'sigma1', 'med2', 'sigma2','beta','maxarea', 'outdir','seed'),
+                       value = c(sampling, n.weighted, n.random, type1_prop, med1, sigma1, med2, sigma2, beta, maxarea, outdir, seed)),
             file=paste0(outdir,'args.csv'),
             row.names=F)
   
@@ -54,7 +54,7 @@ dataSim <- function(sampling='weighted', model_weights=T,
     
     type.random <- c( rep(1,n1) , rep(2,n2) )
     x.random <- c( sim1$x[idx.rsamp1] , sim2$x[idx.rsamp2] )
-    area.random <- c( sim1$area[idx.rsamp1] , sim2$area[idx.rsamp2] )
+    area.random <- c( sim1$A[idx.rsamp1] , sim2$A[idx.rsamp2] )
     
     saveRDS(random, paste0(outdir, 'random.rds'))
     
@@ -86,7 +86,7 @@ dataSim <- function(sampling='weighted', model_weights=T,
     
     type.weighted <- c( rep(1,n1) , rep(2,n2) )
     x.weighted <- c( sim1$x[idx.wsamp1] , sim2$x[idx.wsamp2] )
-    area.weighted <- c( sim1$area[idx.wsamp1] , sim2$area[idx.wsamp2] )
+    area.weighted <- c( sim1$A[idx.wsamp1] , sim2$A[idx.wsamp2] )
     
     saveRDS(weighted, paste0(outdir, 'weighted.rds'))
     

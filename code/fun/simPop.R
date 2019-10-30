@@ -13,7 +13,7 @@ simPop <- function(n=1e3, med=100, sigma=50, beta=0.2, maxarea=1, maxpop=Inf){
   
    # area
   area <- sort(runif(n, 1, maxarea))
-  orderD <- order(D)
+  orderD <- order(-D)
   A <- rep(NA,n)
   for(i in 1:n) A[orderD[i]] <- area[i]
   
@@ -31,5 +31,5 @@ simPop <- function(n=1e3, med=100, sigma=50, beta=0.2, maxarea=1, maxpop=Inf){
   }
   
   # result
-  return(list(N=N, D=D, x=x, area=area, alpha=alpha, beta=beta, sigma=sigma))
+  return(list(N=N, D=D, A=A, x=x, alpha=alpha, beta=beta, sigma=sigma))
 }
