@@ -5,7 +5,7 @@ cat("\014")
 try(dev.off())
 
 # working directory
-setwd('C:/RESEARCH/2018 GRID3 WorldPop/git/wpgp/weighted-likelihood')
+setwd('C:/RESEARCH/git/wpgp/weighted-likelihood')
 
 # source directory
 if(.Platform$OS.type=="unix"){
