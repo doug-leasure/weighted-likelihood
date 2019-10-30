@@ -26,46 +26,57 @@ for(toggleCov in 0:1){
   outdir <- paste0('out/sims_cov',toggleCov,'/')
   dir.create(outdir, showWarnings=F)
   
-  # simulation names
-  sims <- c('random','weighted_naive','weighted','combined')
+  # simulate populations
+  maxarea <- 10 
+  beta <- 0.2
+  med1 <- 300 
+  sigma1 <- 300 
+  med2 <- 100
+  sigma2 <- 100
   
-  # random sampling
-  dataSim(sampling='random', 
-          n.random=1000, 
-          n.weighted=0, 
-          outdir=paste0(outdir,sims[1],'/'),
-          seed=seed)
+  if(toggleCov==0) {
+    sigma1 <- sigma1 * 0.5
+    sigma2 <- sigma2 * 0.5
+  }
   
-  # weighted sampling, no model weights
-  dataSim(sampling='weighted', 
-          n.random=0, 
-          n.weighted=1000, 
-          model_weights=F, 
-          outdir=paste0(outdir,sims[2],'/'),
-          seed=seed)
-  
-  # weighted sampling, with model weights
-  dataSim(sampling='weighted', 
-          n.random=0, 
-          n.weighted=1000, 
-          outdir=paste0(outdir,sims[3],'/'),
-          seed=seed)
-  
-  # random sampling and weighted sampling, with model weights
-  dataSim(sampling='combined', 
-          n.random=500, 
-          n.weighted=500, 
-          outdir=paste0(outdir,sims[4],'/'),
-          seed=seed)
+  simParms <- list(random = list(sampling='random',
+                                 n.random=1000,
+                                 n.weighted=0,
+                                 outdir=paste0(outdir,'random/'),
+                                 maxarea=maxarea,beta=beta,med1=med1,sigma1=sigma1,med2=med2,sigma2=sigma2,seed=seed),
+                   
+                   weighted_naive = list(sampling='weighted',
+                                         n.random=0,
+                                         n.weighted=1000,
+                                         model_weights=F, 
+                                         outdir=paste0(outdir,'weighted_naive/'),
+                                         maxarea=maxarea,beta=beta,med1=med1,sigma1=sigma1,med2=med2,sigma2=sigma2,seed=seed),
+                   
+                   weighted = list(sampling='weighted',
+                                   n.random=0,
+                                   n.weighted=1000,
+                                   outdir=paste0(outdir,'weighted/'),
+                                   maxarea=maxarea,beta=beta,med1=med1,sigma1=sigma1,med2=med2,sigma2=sigma2,seed=seed),
+                   
+                   combined = list(sampling='combined', 
+                                   n.random=500, 
+                                   n.weighted=500, 
+                                   outdir=paste0(outdir,'combined/'),
+                                   maxarea=maxarea,beta=beta,med1=med1,sigma1=sigma1,med2=med2,sigma2=sigma2,seed=seed)
+                   )
+
+  for(i in names(simParms)){
+    do.call(dataSim, simParms[[i]])
+  }
   
   # fit models
-  for(i in sims){
+  for(i in names(simParms)){
     jagsModel(paste0(outdir,i,'/'), toggleCov=toggleCov)
   }
   
   # plot (4 panel) of data and model
   plotModelPanel(file=paste0(outdir,'sim_model.jpg'), 
-                 sims=sims, 
+                 sims=names(simParms), 
                  dir=outdir, 
                  plotReal=T)
   
