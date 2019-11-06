@@ -9,7 +9,7 @@ jagsModel <- function(dir, toggleCov=T){
   set.seed(jd$seed)
   
   # monitor
-  par.monitor <- c('alpha','beta','log_sigma','SIGMA','LOG_SIGMA','yhat')
+  par.monitor <- c('alpha','beta','LOG_SIGMA','Dhat')
   
   if(jd$toggleCov==0) par.monitor <- par.monitor[-which(par.monitor=='beta')]
   
@@ -46,7 +46,8 @@ jagsModel <- function(dir, toggleCov=T){
   
   # check traceplots
   pdf(paste0(dir, '/trace.pdf'))
-  traceplot(jm$mcmc[,c(paste0('alpha[',1:2,']'),paste0('log_sigma[',1:2,']'),paste0('SIGMA[',1:2,']'))])
+  tracenames <- varnames(jm$mcmc)[!grepl('hat',varnames(jm$mcmc))]
+  traceplot(jm$mcmc[,tracenames])
   dev.off()
   
   # mcmc.list to data.frame
@@ -61,9 +62,9 @@ jagsModel <- function(dir, toggleCov=T){
     
     sim <- readRDS(paste0(dir,'sim',t,'.rds'))
     
-    yhat <- predPopLoop(sim=sim, d=d, t=t)
+    Nhat <- predPop(sim=sim, d=d, t=t)
     
-    d[,paste0('poptotal[',t,']')] <- apply(yhat, 1, sum)
+    d[,paste0('poptotal[',t,']')] <- apply(Nhat, 1, sum)
   }
   
   # save to disk

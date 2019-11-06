@@ -5,14 +5,14 @@ plotModel <- function(jd, d, real1=NA, real2=NA,
   par(mar=mar)
   
   # densities
-  density_y1 <- density(jd$y[jd$type==1], from=0, to=xmax)
-  density_y2 <- density(jd$y[jd$type==2], from=0, to=xmax)
+  density_y1 <- density(jd$D[jd$type==1], from=0, to=xmax)
+  density_y2 <- density(jd$D[jd$type==2], from=0, to=xmax)
   
   if(length(real1)>1) density_real1 <- density(real1, from=0, to=xmax)
   if(length(real2)>1) density_real2 <- density(real2, from=0, to=xmax)
   
-  density_yhat1 <- density(as.matrix(d[,paste0('yhat[',jd$itype1,']')]), from=0, to=xmax)
-  density_yhat2 <- density(as.matrix(d[,paste0('yhat[',jd$itype2,']')]), from=0, to=xmax)
+  density_yhat1 <- density(as.matrix(d[,paste0('Dhat[',jd$itype1,']')]), from=0, to=xmax)
+  density_yhat2 <- density(as.matrix(d[,paste0('Dhat[',jd$itype2,']')]), from=0, to=xmax)
   
   #gray level
   g1 <- 0.6

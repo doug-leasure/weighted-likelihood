@@ -26,18 +26,13 @@ for(toggleCov in 0:1){
   outdir <- paste0('out/sims_cov',toggleCov,'/')
   dir.create(outdir, showWarnings=F)
   
-  # simulate populations
+  # simulation parameters
   maxarea <- 10 
   beta <- 0.2
   med1 <- 300 
-  sigma1 <- 300 
+  sigma1 <- 150 
   med2 <- 100
   sigma2 <- 100
-  
-  if(toggleCov==0) {
-    sigma1 <- sigma1 * 0.5
-    sigma2 <- sigma2 * 0.5
-  }
   
   simParms <- list(random = list(sampling='random',
                                  n.random=1000,
@@ -66,11 +61,10 @@ for(toggleCov in 0:1){
                    )
 
   for(i in names(simParms)){
+    # simulate population
     do.call(dataSim, simParms[[i]])
-  }
-  
-  # fit models
-  for(i in names(simParms)){
+    
+    # fit models
     jagsModel(paste0(outdir,i,'/'), toggleCov=toggleCov)
   }
   

@@ -3,14 +3,19 @@ model{
   for(i in 1:n){
     
     # LIKELIHOOD FUNCTION
-    y[i] ~ dlnorm(med[i], log_tau[i])
     
-    # median (on natural scale) of lognormal distribution
-    med[i] <- alpha[type[i]] + beta * x[i] * toggleCov
+    # population size
+    N[i] ~ dpois(D_[i] * A[i])
+    
+    # population density
+    D_[i] ~ dlnorm(Dbar[i], log_tau[i])
+    
+    # regression for population density
+    Dbar[i] <- alpha[type[i]] + beta * x[i] * toggleCov
     
     # posterior prediction
-    yhat[i] ~ dlnorm(med[i], log_tau[i])
-    Nhat[i] <- yhat[i] * a[i]
+    Dhat[i] ~ dlnorm(Dbar[i], log_tau[i])
+    Nhat[i] ~ dpois(Dhat[i] * A[i])
     
     # tau[i] = sample-specific estimate of precision (after weighting)
     log_tau[i] <- pow(log_sigma[type[i]],-2) * w[i]
@@ -33,7 +38,7 @@ model{
   
   # NAT_SIGMA = LOG_SIGMA converted to natural scale
   for(t in 1:2){
-    SIGMA[t] <- sqrt( exp( 2 * log(med[t]) + LOG_SIGMA[t]^2 ) * ( exp( LOG_SIGMA[t]^2 ) - 1 ) )
+    SIGMA[t] <- sqrt( exp( 2 * log(alpha[t]) + LOG_SIGMA[t]^2 ) * ( exp( LOG_SIGMA[t]^2 ) - 1 ) )
   }
   
   # LOG_SIGMA = sqrt weighted average of sig among samples

@@ -28,8 +28,8 @@ dataSim <- function(sampling='weighted', model_weights=T,
   saveRDS(sim1, file=paste0(outdir, 'sim1.rds'))
   saveRDS(sim2, file=paste0(outdir, 'sim2.rds'))
   
-  real1 <- sim1$D
-  real2 <- sim2$D
+  real1 <- sim1$N
+  real2 <- sim2$N
   
   real <- c(real1, real2)
   
@@ -54,15 +54,17 @@ dataSim <- function(sampling='weighted', model_weights=T,
     
     type.random <- c( rep(1,n1) , rep(2,n2) )
     x.random <- c( sim1$x[idx.rsamp1] , sim2$x[idx.rsamp2] )
-    area.random <- c( sim1$A[idx.rsamp1] , sim2$A[idx.rsamp2] )
+    A.random <- c( sim1$A[idx.rsamp1] , sim2$A[idx.rsamp2] )
+    D.random <- c( sim1$D[idx.rsamp1] , sim2$D[idx.rsamp2] )
     
     saveRDS(random, paste0(outdir, 'random.rds'))
     
     if(sampling=='random'){
       inv.weights <- rep(1/n.random, n.random)
-      y <- random
+      N <- random
+      D <- D.random
       x <- x.random
-      area <- area.random
+      A <- A.random
       type <- type.random
     }
   }
@@ -86,39 +88,43 @@ dataSim <- function(sampling='weighted', model_weights=T,
     
     type.weighted <- c( rep(1,n1) , rep(2,n2) )
     x.weighted <- c( sim1$x[idx.wsamp1] , sim2$x[idx.wsamp2] )
-    area.weighted <- c( sim1$A[idx.wsamp1] , sim2$A[idx.wsamp2] )
+    A.weighted <- c( sim1$A[idx.wsamp1] , sim2$A[idx.wsamp2] )
+    D.weighted <- c( sim1$D[idx.wsamp1] , sim2$D[idx.wsamp2] )
     
     saveRDS(weighted, paste0(outdir, 'weighted.rds'))
     
     if(sampling=='weighted'){
       inv.weights <- weights_calc(numerator1=weighted, denominator=sum(real), inverse=T)
-      y <- weighted
+      N <- weighted
+      D <- D.weighted
       x <- x.weighted
-      area <- area.weighted
+      A <- A.weighted
       type <- type.weighted
     }
   } 
   if(sampling=='combined'){
     
     # combine random + weighted
-    y <- c(weighted, random)
+    N <- c(weighted, random)
     type <- c(type.weighted, type.random)
     x <- c(x.weighted, x.random)
-    area <- c(area.weighted, area.random)
+    D <- c(D.weighted, D.random)
+    A <- c(A.weighted, A.random)
     
     inv.weights <- weights_calc(numerator1=weighted, denominator=sum(real), numerator2=random, inverse=T)
     
-    saveRDS(y, paste0(outdir, 'random_weighted.rds'))
+    saveRDS(N, paste0(outdir, 'random_weighted.rds'))
   }
   
-  if(!model_weights) inv.weights <- rep(1/length(y), length(y))
+  if(!model_weights) inv.weights <- rep(1/length(N), length(N))
   
   # jags data
-  jd <- list(n = length(y),
-             y = y,
-             w = inv.weights,
+  jd <- list(n = length(N),
+             N = N,
+             D = D,
+             A = A,
              x = x,
-             a = area,
+             w = inv.weights,
              type = type,
              itype1 = which(type==1),
              itype2 = which(type==2),
