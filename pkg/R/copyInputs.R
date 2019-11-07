@@ -18,15 +18,19 @@ copyInputs <- function(srcdir, outdir, overwrite=F, OS.type='windows'){
     srcdir <- file.path('//worldpop.files.soton.ac.uk', srcdir)
   }
 
-  # create output directory
-  dir.create(outdir, showWarnings=F)
+  if(!dir.exists(srcdir)){
+    print(paste('Source directory does not exist:', srcdir))
+  } else {
+    # create output directory
+    dir.create(outdir, showWarnings=F)
 
-  # list files
-  lf <- list.files(srcdir, recursive=T, include.dirs=T)
+    # list files
+    lf <- list.files(srcdir, recursive=T, include.dirs=T)
 
-  # copy files
-  for(f in lf){
-    print(f)
-    file.copy(from=file.path(srcdir,f), to=file.path(outdir), overwrite=overwrite)
+    # copy files
+    for(f in lf){
+      print(f)
+      file.copy(from=file.path(srcdir,f), to=file.path(outdir), overwrite=overwrite)
+    }
   }
 }
