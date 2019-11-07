@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1573122137589.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "D357AAE5",
+    "lastKnownWriteTime" : 1573124341,
+    "last_content_update" : 1573124341992,
+    "path" : "C:/RESEARCH/git/wpgp/weighted-likelihood/code/1 simulation.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "18,0",
+        "scrollLine" : "5"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
