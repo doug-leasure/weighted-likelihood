@@ -8,14 +8,14 @@
 #'
 #' @export
 
-dataDRC <- function(indir='in/', outdir='out/drc/', seed=42){
+dataDRC <- function(indir='in', outdir='out/drc', seed=42){
 
   set.seed(seed)
 
   # load data
-  clusters <- read.csv(paste0(indir,"cod_survey_clusters.csv"))
-  weights <- st_read(paste0(indir,'gis/samlingWeights_clusters.shp'))
-  cod_survey_covariates <- read.csv(paste0(indir,"cod_survey_covariate.csv"), row.names = 1)
+  clusters <- read.csv(file.path(indir,"cod_survey_clusters.csv"))
+  weights <- st_read(file.path(indir,'gis/samlingWeights_clusters.shp'))
+  cod_survey_covariates <- read.csv(file.path(indir,"cod_survey_covariate.csv"), row.names = 1)
 
   #  filter clusters with no residents
   clusters$ucla_cluster_id <- tolower(clusters$ucla_cluster_id)
@@ -160,10 +160,10 @@ dataDRC <- function(indir='in/', outdir='out/drc/', seed=42){
   )
 
   # write jags data to disk
-  saveRDS(jd_random, file=paste0(outdir,'random/jd.rds'))
-  saveRDS(jd_weighted, file=paste0(outdir,'weighted/jd.rds'))
-  saveRDS(jd_weighted_naive, file=paste0(outdir,'weighted_naive/jd.rds'))
-  saveRDS(jd_all, file=paste0(outdir,'combined/jd.rds'))
+  saveRDS(jd_random, file=file.path(outdir,'random/jd.rds'))
+  saveRDS(jd_weighted, file=file.path(outdir,'weighted/jd.rds'))
+  saveRDS(jd_weighted_naive, file=file.path(outdir,'weighted_naive/jd.rds'))
+  saveRDS(jd_all, file=file.path(outdir,'combined/jd.rds'))
 
 }
 

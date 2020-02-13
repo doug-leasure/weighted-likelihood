@@ -32,7 +32,7 @@ dataSim <- function(sampling='weighted', model_weights=T,
   # save arguments
   write.csv(data.frame(argument = c('sampling','n.weighted', 'n.random','type1_prop', 'med1', 'sigma1', 'med2', 'sigma2','beta','maxarea', 'outdir','seed'),
                        value = c(sampling, n.weighted, n.random, type1_prop, med1, sigma1, med2, sigma2, beta, maxarea, outdir, seed)),
-            file=paste0(outdir,'args.csv'),
+            file=file.path(outdir,'args.csv'),
             row.names=F)
   
   ##---- simulate population (i.e. census) ----##
@@ -46,17 +46,17 @@ dataSim <- function(sampling='weighted', model_weights=T,
   sim1 <- simPop(n=n.real1, med=med1, sigma=sigma1, beta=beta, maxarea=maxarea)
   sim2 <- simPop(n=n.real2, med=med2, sigma=sigma2, beta=beta, maxarea=maxarea)
   
-  saveRDS(sim1, file=paste0(outdir, 'sim1.rds'))
-  saveRDS(sim2, file=paste0(outdir, 'sim2.rds'))
+  saveRDS(sim1, file=file.path(outdir, 'sim1.rds'))
+  saveRDS(sim2, file=file.path(outdir, 'sim2.rds'))
   
   real1 <- sim1$N
   real2 <- sim2$N
   
   real <- c(real1, real2)
   
-  saveRDS(real1, file=paste0(outdir, 'real1.rds'))
-  saveRDS(real2, file=paste0(outdir, 'real2.rds'))
-  saveRDS(real, file=paste0(outdir, 'real.rds'))
+  saveRDS(real1, file=file.path(outdir, 'real1.rds'))
+  saveRDS(real2, file=file.path(outdir, 'real2.rds'))
+  saveRDS(real, file=file.path(outdir, 'real.rds'))
   
   ##---- sample from population ----##
   if(sampling %in% c('random','combined')){
@@ -78,7 +78,7 @@ dataSim <- function(sampling='weighted', model_weights=T,
     A.random <- c( sim1$A[idx.rsamp1] , sim2$A[idx.rsamp2] )
     D.random <- c( sim1$D[idx.rsamp1] , sim2$D[idx.rsamp2] )
     
-    saveRDS(random, paste0(outdir, 'random.rds'))
+    saveRDS(random, file.path(outdir, 'random.rds'))
     
     if(sampling=='random'){
       inv.weights <- rep(1/n.random, n.random)
@@ -112,7 +112,7 @@ dataSim <- function(sampling='weighted', model_weights=T,
     A.weighted <- c( sim1$A[idx.wsamp1] , sim2$A[idx.wsamp2] )
     D.weighted <- c( sim1$D[idx.wsamp1] , sim2$D[idx.wsamp2] )
     
-    saveRDS(weighted, paste0(outdir, 'weighted.rds'))
+    saveRDS(weighted, file.path(outdir, 'weighted.rds'))
     
     if(sampling=='weighted'){
       inv.weights <- weights_calc(numerator1=weighted, denominator=sum(real), inverse=T)
@@ -134,7 +134,7 @@ dataSim <- function(sampling='weighted', model_weights=T,
     
     inv.weights <- weights_calc(numerator1=weighted, denominator=sum(real), numerator2=random, inverse=T)
     
-    saveRDS(N, paste0(outdir, 'random_weighted.rds'))
+    saveRDS(N, file.path(outdir, 'random_weighted.rds'))
   }
   
   if(!model_weights) inv.weights <- rep(1/length(N), length(N))
@@ -152,6 +152,6 @@ dataSim <- function(sampling='weighted', model_weights=T,
              ntotal = ntotal,
              seed = seed
   )
-  saveRDS(jd, paste0(outdir,'jd.rds'))
+  saveRDS(jd, file.path(outdir,'jd.rds'))
 }
   

@@ -9,11 +9,11 @@
 #'
 #' @export
 
-dataZMB <- function(indir='in/', outdir='out/zmb/', area=F, seed=42){
+dataZMB <- function(indir='in', outdir='out/zmb', area=F, seed=42){
   set.seed(seed)
 
   # read in data
-  clusters <- read.csv("in/zmb_smglsurvey_clusters.csv")
+  clusters <- read.csv(file.path(indir,"zmb_smglsurvey_clusters.csv"))
 
   # total clusters = 1735
   # total rural (type 2) clusters = 1545
@@ -27,10 +27,10 @@ dataZMB <- function(indir='in/', outdir='out/zmb/', area=F, seed=42){
   u.clusters <- clusters[clusters$REGION == "Urban",]
 
   for(i in c('random','weighted_naive','weighted','combined')){
-    saveRDS(u.clusters$N, paste0(outdir,i,'/real1.rds'))
-    saveRDS(r.clusters$N, paste0(outdir,i,'/real2.rds'))
-    saveRDS(u.clusters$sett_area, paste0(outdir,i,'/area1.rds'))
-    saveRDS(r.clusters$sett_area, paste0(outdir,i,'/area2.rds'))
+    saveRDS(u.clusters$N, file.path(outdir, i, 'real1.rds'))
+    saveRDS(r.clusters$N, file.path(outdir, i, 'real2.rds'))
+    saveRDS(u.clusters$sett_area, file.path(outdir, i, 'area1.rds'))
+    saveRDS(r.clusters$sett_area, file.path(outdir, i, 'area2.rds'))
   }
 
   r.clust <- r.clusters$pop_dens
@@ -144,8 +144,8 @@ dataZMB <- function(indir='in/', outdir='out/zmb/', area=F, seed=42){
   )
 
   # write jags data to disk
-  saveRDS(jd_random, file=paste0(outdir,'random/jd.rds'))
-  saveRDS(jd_weighted, file=paste0(outdir,'weighted/jd.rds'))
-  saveRDS(jd_weighted_naive, file=paste0(outdir,'weighted_naive/jd.rds'))
-  saveRDS(jd_all, file=paste0(outdir,'combined/jd.rds'))
+  saveRDS(jd_random, file=file.path(outdir,'random/jd.rds'))
+  saveRDS(jd_weighted, file=file.path(outdir,'weighted/jd.rds'))
+  saveRDS(jd_weighted_naive, file=file.path(outdir,'weighted_naive/jd.rds'))
+  saveRDS(jd_all, file=file.path(outdir,'combined/jd.rds'))
 }

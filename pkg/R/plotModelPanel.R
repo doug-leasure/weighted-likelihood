@@ -19,8 +19,8 @@ plotModelPanel <- function(file, sims, dir, plotReal=F, xmax=1e3){
   layout(matrix(1:4, nrow=2, ncol=2, byrow=F), widths=c(1,1), heights=c(0.9,1.05))
 
   # panel 1: random
-  sim1 <- readRDS(paste0(dir,sims[1],'/sim1.rds'))
-  sim2 <- readRDS(paste0(dir,sims[1],'/sim2.rds'))
+  sim1 <- readRDS(file.path(dir,sims[1],'sim1.rds'))
+  sim2 <- readRDS(file.path(dir,sims[1],'sim2.rds'))
 
   if(plotReal){
     real1 <- sim1$D
@@ -29,8 +29,8 @@ plotModelPanel <- function(file, sims, dir, plotReal=F, xmax=1e3){
     real1 <- real2 <- NA
   }
 
-  plotModel(jd=readRDS(paste0(dir,sims[1],'/jd.rds')),
-            d=readRDS(paste0(dir,sims[1],'/d.rds')),
+  plotModel(jd=readRDS(file.path(dir,sims[1],'jd.rds')),
+            d=readRDS(file.path(dir,sims[1],'d.rds')),
             real1=real1,
             real2=real2,
             main=sims[1],
@@ -42,8 +42,8 @@ plotModelPanel <- function(file, sims, dir, plotReal=F, xmax=1e3){
   )
 
   # panel 2: combined
-  sim1 <- readRDS(paste0(dir,sims[2],'/sim1.rds'))
-  sim2 <- readRDS(paste0(dir,sims[2],'/sim2.rds'))
+  sim1 <- readRDS(file.path(dir,sims[2],'sim1.rds'))
+  sim2 <- readRDS(file.path(dir,sims[2],'sim2.rds'))
 
   if(plotReal){
     real1 <- sim1$D
@@ -52,8 +52,8 @@ plotModelPanel <- function(file, sims, dir, plotReal=F, xmax=1e3){
     real1 <- real2 <- NA
   }
 
-  plotModel(jd=readRDS(paste0(dir,sims[2],'/jd.rds')),
-            d=readRDS(paste0(dir,sims[2],'/d.rds')),
+  plotModel(jd=readRDS(file.path(dir,sims[2],'jd.rds')),
+            d=readRDS(file.path(dir,sims[2],'d.rds')),
             real1=real1,
             real2=real2,
             main=sims[2],
@@ -63,8 +63,8 @@ plotModelPanel <- function(file, sims, dir, plotReal=F, xmax=1e3){
   )
 
   # panel 3: weighted unadjusted
-  sim1 <- readRDS(paste0(dir,sims[3],'/sim1.rds'))
-  sim2 <- readRDS(paste0(dir,sims[3],'/sim2.rds'))
+  sim1 <- readRDS(file.path(dir,sims[3],'sim1.rds'))
+  sim2 <- readRDS(file.path(dir,sims[3],'sim2.rds'))
 
   if(plotReal){
     real1 <- sim1$D
@@ -73,8 +73,8 @@ plotModelPanel <- function(file, sims, dir, plotReal=F, xmax=1e3){
     real1 <- real2 <- NA
   }
 
-  plotModel(jd=readRDS(paste0(dir,sims[3],'/jd.rds')),
-            d=readRDS(paste0(dir,sims[3],'/d.rds')),
+  plotModel(jd=readRDS(file.path(dir,sims[3],'jd.rds')),
+            d=readRDS(file.path(dir,sims[3],'d.rds')),
             real1=real1,
             real2=real2,
             main=sims[3],
@@ -87,8 +87,8 @@ plotModelPanel <- function(file, sims, dir, plotReal=F, xmax=1e3){
 
 
   # panel 4: weighted adjusted
-  sim1 <- readRDS(paste0(dir,sims[4],'/sim1.rds'))
-  sim2 <- readRDS(paste0(dir,sims[4],'/sim2.rds'))
+  sim1 <- readRDS(file.path(dir,sims[4],'sim1.rds'))
+  sim2 <- readRDS(file.path(dir,sims[4],'sim2.rds'))
 
   if(plotReal){
     real1 <- sim1$D
@@ -97,8 +97,8 @@ plotModelPanel <- function(file, sims, dir, plotReal=F, xmax=1e3){
     real1 <- real2 <- NA
   }
 
-  plotModel(jd=readRDS(paste0(dir,sims[4],'/jd.rds')),
-            d=readRDS(paste0(dir,sims[4],'/d.rds')),
+  plotModel(jd=readRDS(file.path(dir,sims[4],'jd.rds')),
+            d=readRDS(file.path(dir,sims[4],'d.rds')),
             real1=real1,
             real2=real2,
             main=sims[4],

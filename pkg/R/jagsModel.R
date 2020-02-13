@@ -10,7 +10,7 @@
 jagsModel <- function(dir, toggleCov=T){
 
   # data
-  jd <- readRDS(paste0(dir,'jd.rds'))
+  jd <- readRDS(file.path(dir,'jd.rds'))
 
   jd$toggleCov <- as.numeric(toggleCov)
 
@@ -51,10 +51,10 @@ jagsModel <- function(dir, toggleCov=T){
   )
   jm$init <- init
   jm$seed <- jd$seed
-  saveRDS(jm, paste0(dir, 'jm.rds'))
+  saveRDS(jm, file.path(dir, 'jm.rds'))
 
   # check traceplots
-  pdf(paste0(dir, '/trace.pdf'))
+  pdf(file.path(dir, 'trace.pdf'))
   tracenames <- varnames(jm$mcmc)[!grepl('hat',varnames(jm$mcmc))]
   traceplot(jm$mcmc[,tracenames])
   dev.off()
@@ -66,7 +66,7 @@ jagsModel <- function(dir, toggleCov=T){
   for(t in 1:2){
     print(paste0('Calculate type ',t,' population total'))
 
-    sim <- readRDS(paste0(dir,'sim',t,'.rds'))
+    sim <- readRDS(file.path(dir,paste0('sim',t,'.rds')))
 
     Nhat <- predPop(sim=sim, d=d, t=t)
 
@@ -74,5 +74,5 @@ jagsModel <- function(dir, toggleCov=T){
   }
 
   # save to disk
-  saveRDS(d, file=paste0(dir, 'd.rds'))
+  saveRDS(d, file=file.path(dir, 'd.rds'))
 }

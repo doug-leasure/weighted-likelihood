@@ -25,7 +25,7 @@ dir.create('out', showWarnings=F)
 
 for(toggleCov in 0:1){
 
-  outdir <- paste0('out/sims_cov',toggleCov,'/')
+  outdir <- file.path('out',paste0('sims_cov',toggleCov))
   dir.create(outdir, showWarnings=F)
 
   # simulation parameters
@@ -39,26 +39,26 @@ for(toggleCov in 0:1){
   simParms <- list(random = list(sampling='random',
                                  n.random=1000,
                                  n.weighted=0,
-                                 outdir=paste0(outdir,'random/'),
+                                 outdir=file.path(outdir,'random'),
                                  maxarea=maxarea,beta=beta,med1=med1,sigma1=sigma1,med2=med2,sigma2=sigma2,seed=seed),
 
                    weighted_naive = list(sampling='weighted',
                                          n.random=0,
                                          n.weighted=1000,
                                          model_weights=F,
-                                         outdir=paste0(outdir,'weighted_naive/'),
+                                         outdir=file.path(outdir,'weighted_naive'),
                                          maxarea=maxarea,beta=beta,med1=med1,sigma1=sigma1,med2=med2,sigma2=sigma2,seed=seed),
 
                    weighted = list(sampling='weighted',
                                    n.random=0,
                                    n.weighted=1000,
-                                   outdir=paste0(outdir,'weighted/'),
+                                   outdir=file.path(outdir,'weighted'),
                                    maxarea=maxarea,beta=beta,med1=med1,sigma1=sigma1,med2=med2,sigma2=sigma2,seed=seed),
 
                    combined = list(sampling='combined',
                                    n.random=500,
                                    n.weighted=500,
-                                   outdir=paste0(outdir,'combined/'),
+                                   outdir=file.path(outdir,'combined'),
                                    maxarea=maxarea,beta=beta,med1=med1,sigma1=sigma1,med2=med2,sigma2=sigma2,seed=seed)
                    )
 
@@ -67,18 +67,18 @@ for(toggleCov in 0:1){
     do.call(dataSim, simParms[[i]])
 
     # fit models
-    jagsModel(paste0(outdir,i,'/'), toggleCov=toggleCov)
+    jagsModel(file.path(outdir,i), toggleCov=toggleCov)
   }
 
   # plot (4 panel) of data and model
-  plotModelPanel(file=paste0(outdir,'sim_model.jpg'),
+  plotModelPanel(file=file.path(outdir,'sim_model.jpg'),
                  sims=names(simParms),
                  dir=outdir,
                  plotReal=T)
 
   # plot of population totals for each model
   plotTotals(dat = plotTotalsData(dir=outdir, plotReal=T),
-             file = paste0(outdir,'sim_totals.jpg'),
+             file = file.path(outdir,'sim_totals.jpg'),
              plotReal=T
   )
 }
