@@ -57,7 +57,7 @@ chains <- 4
 warmup <- 500
 iter <- 1000
 
-fit <- rstan::stan(file = 'model_A.stan',
+fit <- rstan::stan(file = 'models/model_A.stan',
                    data = md,
                    chains = chains,
                    iter = warmup + iter,
