@@ -1,0 +1,85 @@
+# cleanup
+rm(list=ls())
+gc()
+cat("\014")
+try(dev.off())
+
+# seed
+seed <- runif(1, 0, 42)
+set.seed(seed)
+
+# working directory
+setwd('C:/RESEARCH/git/wpgp/weighted-likelihood')
+# setwd('//filestore.soton.ac.uk/users/cad1c14/mydocuments/GitHub/weighted-likelihood')
+
+# load packages
+library(devtools)
+load_all('pkg')
+
+# load inputs
+srcdir <- 'worldpop/Projects/WP517763_GRID3/Working/weighted-likelihood/in'
+copyInputs(srcdir=srcdir, outdir=file.path(getwd(),'in'), overwrite=F, OS.type=.Platform$OS.type)
+
+# create directories
+dir.create('out', showWarnings=F)
+
+for(toggleCov in 0:1){
+
+  outdir <- file.path('out',paste0('sims_cov',toggleCov))
+  dir.create(outdir, showWarnings=F)
+
+  # simulation parameters
+  maxarea <- 10
+  beta <- 0.2
+  med1 <- 300
+  sigma1 <- 150
+  med2 <- 100
+  sigma2 <- 100
+
+  simParms <- list(random = list(sampling='random',
+                                 n.random=1000,
+                                 n.weighted=0,
+                                 outdir=file.path(outdir,'random'),
+                                 maxarea=maxarea,beta=beta,med1=med1,sigma1=sigma1,med2=med2,sigma2=sigma2,seed=seed),
+
+                   weighted_naive = list(sampling='weighted',
+                                         n.random=0,
+                                         n.weighted=1000,
+                                         model_weights=F,
+                                         outdir=file.path(outdir,'weighted_naive'),
+                                         maxarea=maxarea,beta=beta,med1=med1,sigma1=sigma1,med2=med2,sigma2=sigma2,seed=seed),
+
+                   weighted = list(sampling='weighted',
+                                   n.random=0,
+                                   n.weighted=1000,
+                                   outdir=file.path(outdir,'weighted'),
+                                   maxarea=maxarea,beta=beta,med1=med1,sigma1=sigma1,med2=med2,sigma2=sigma2,seed=seed),
+
+                   combined = list(sampling='combined',
+                                   n.random=500,
+                                   n.weighted=500,
+                                   outdir=file.path(outdir,'combined'),
+                                   maxarea=maxarea,beta=beta,med1=med1,sigma1=sigma1,med2=med2,sigma2=sigma2,seed=seed)
+                   )
+
+  for(i in names(simParms)){
+    # simulate population
+    do.call(dataSim, simParms[[i]])
+
+    # fit models
+    jagsModel(file.path(outdir,i), toggleCov=toggleCov)
+  }
+
+  # plot (4 panel) of data and model
+  plotModelPanel(file=file.path(outdir,'sim_model.jpg'),
+                 sims=names(simParms),
+                 dir=outdir,
+                 plotReal=T)
+
+  # plot of population totals for each model
+  plotTotals(dat = plotTotalsData(dir=outdir, plotReal=T),
+             file = file.path(outdir,'sim_totals.jpg'),
+             plotReal=T
+  )
+}
+
