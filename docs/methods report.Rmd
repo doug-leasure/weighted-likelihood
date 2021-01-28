@@ -1,0 +1,166 @@
+---
+title: "Weighted likelihood to recover unbiased population estimates from a weighted sample."
+author: "WorldPop, University of Southampton"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+always_allow_html: true
+header-includes:
+   - \usepackage{amsmath}
+output:
+  bookdown::pdf_document2: 
+    extra_dependencies: ["float"]
+    fig_width: 5
+    fig_height: 4
+    fig_caption: true
+geometry: margin=2.1cm
+documentclass: article
+bibliography: [refs.bib]
+csl: worldpop.csl
+---
+
+<!-- --- -->
+<!-- output: -->
+<!--   html_document: default -->
+<!--   pdf_document: default -->
+<!-- --- -->
+
+# Introduction
+
+Population estimates that are accurate and up-to-date are critical for government planning and development projects in low and middle income countries where recent census results may not be available.  Statistical models can be used to produce gridded population estimates with national coverage based on population enumeration data from a representative sample of locations. Patterns of population density observed at these locations define the outcome of the statistical model, and so it is critical that the locations are representative of the entire population. If the sample design targetted specific populations (e.g. urban communities or those vulnerable to a disease), then population estimates for new locations will be biased towards patterns observed in those communities. 
+
+For a statistical model aiming to map the number of people per hectare nationally, a *representative* sample would be defined as a sample of locations (e.g. small areas with 50 buildings each) in which patterns of people per building measured from the sample are the same as the patterns that would be observed at new locations nationally. This includes the mean and variance of people per building among buildings at each location as well as similar relationships between . Furthermore, the distribution of population densities (e.g. people per building) from the sampled locations is no different than the theoretical distribution of population densities from all of the unobserved locations across the country. In other words, the .  There are two common sample designs used for surveys that collect population enumeration data: stratified random sampling and PPS sampling (probability proportional to size). 
+
+A stratified random sample of locations would be appropriate to recover unbiased estimates of average population density.  Household surveys are routinely conducted with national coverage. These surveys often use PPS sampling designs (i.e. probability proportional to size) in which locations are selected for the sample based on the number of people or households in that location. The PPS sampling design is intended to select a sample of locations that contain a representative sample of individual people.  This is ideal when using the data to estimate population characteristics such as fertility, mortality, poverty, etc. But, because the weighted sample is based on population size, it will produce a biased result if used to estimate population size.
+
+Our objectives are to:  
+
+1. Demonstrate that a population-weighted sampling design results in biased estimates of population density,
+2. Demonstrate that population totals are sensitive to this bias when estimated population densities are applied across large areas,
+3. Propose a Bayesian weighted-likelihood approach to account for the bias in weighted samples, and
+4. Demonstrate that the weighted-likelihood model recovers unbiased estimates of population densities and population totals across large areas.
+
+In this paper, we will explore the weighted likelihood approach using simulated data to represent samples that are random, weighted, and mixed.  We will stratify the samples based on urban (higher density) and rural (lower density) settlement types.  For simplicity, we will ignore spatial effects (i.e. relative locations of samples) and effects of geospatial covariates.
+
+This analysis is intended as a theoretical foundation to support future empirical studies. 
+
+# Methods
+
+## Data
+
+Populations were simulated using 10,000 random draws from log-normal distributions to represent a census of a population with people in 10,000 different locations (i.e. think of each location as a one hectare grid square). Population densities in urban areas were simulated using a median population density of 750 people per hectare with a standard deviation of 500 to parameterise the log-normal distribution.  Populations in rural areas were simulated using a median of 100 and a standard deviation of 250. Half of the locations were urban and half were rural.
+	
+These simulated populations were sampled using random sampling, population-weighted sampling, or both. Samples comprised a total of 1,000 locations that were enumerated in each simulated population (i.e. a 10\% sample from the total population of 10,000 locations). In simulations that included both types of sampling, half of the samples were random and half were population-weighted.  Stratified sampling was implemented so that an equal number of samples were collected from urban and rural areas. 
+
+Population-weighted sampling used sample weights $w_j$ to define the probabilities for each location $j$ being sampled:  
+	
+\begin{equation}
+  w_j = \frac{N_j}{\sum_{j=1}^{J} N_j }
+\end{equation}
+	
+where $N_j$ is the population size at location $j$, and $J$ is the total number of simulated locations (*i.e.* $J = 10,000$).
+	
+Four scenarios were simulated:
+	
+1. Stratified random sampling with an unweighted model, 
+2. Stratified weighted sampling with an unweighted model,
+3. Stratified weighted sampling with a weighted-likelihood model, and
+4. Stratified random and weighted sampling with a weighted-likelihood model.
+
+
+## Analysis
+
+We used a log-normal weighted-likelihood model to represent the distribution of population densities among locations:
+	
+\begin{equation}
+  y_i \sim LogNormal( log( \mu_t ), \tau_{t,i} )
+\end{equation}
+
+	
+where $y_i$ is the observed number of people at sampled location $i$, and $mu_t$ is the median population size for the settlement type $t$ to which location $i$ belongs. Sample weights $w_i$ were used to calculate model weights $v_i$ to account for the sampling bias:
+
+\begin{equation}
+  v_i = \frac{ w_i^{-1} } { \sum_{i=1}^{I} w_i^{-1} }
+\end{equation}
+	
+where $i$ is a sampled location and $I$ is the total number of sampled locations (i.e. $I = 1,000$).  Model weights are the inverse of sample weights rescaled to sum to one among all sampled locations.
+	
+$\tau_i$ is a location-specific estimate of precision (i.e. the inverse of variance; on the log scale) that is dependent on the model weights $v_i$ and a global estimate of precision $\bar{\tau}_t$:
+	
+\begin{equation}
+  \tau_{t,i} = \bar{\tau}_t v_i
+\end{equation}
+
+We defined the prior distributions of $\mu_t$ and $\bar{\tau}_t$ using uninformative uniform distributions:
+
+\begin{equation}
+	 \mu_t \sim Uniform(0, 5000) \\
+	 \bar{\tau}_t \sim Uniform(0, 3) 
+\end{equation}
+
+	
+$\bar{\tau}_t$ cannot be used to predict $y$ in new locations where model weights are not available.  So, we used a weighted average of $\tau_{t,i}$ to derive an estimate of precision for each settlement type that can be used for predictions in new locations:
+	
+\begin{equation}
+  \theta_t = (\frac{\sum_{i=1}^{I_t} v_i \sqrt{\tau_{t,i}^{-1}} }{\sum_{i=1}^{I_t} v_i})^{-2}
+\end{equation}
+
+	
+where $I_t$ is the total number of samples from settlement type $t$. The weighted average was calculated based on the standard deviation $\sqrt{\tau_{t,i}^{-1}}$ rather than precision $\tau_{t,i}$ because ?????. This derived estimate of precision was used for making posterior predictions without the need for model weights:
+	
+\begin{equation}
+  \hat{y}_t \sim LogNormal( log( \mu_t ), \theta_t)
+\end{equation}
+
+
+
+
+
+# Results
+
+This section should describe the results of the analysis.  
+
+Links to the full results should be provided when possible (e.g. WOPR, woprVision, DOI link, etc).  
+
+Sufficient diagnostics should be included to demonstrate that the results are fit for the intended uses.
+
+
+
+# Discussion
+
+This section should describe the known limitations and assumptions associated with the results.  
+
+This section should recommend next steps that the authors see as most promising to build on the work.  
+
+
+
+# Contributing {-}
+
+This section should describe funding sources, authors, contributers, external collaborators, etc. and their contributions. 
+
+
+
+# Suggested Citation {-}
+
+Leasure DR, Dooley CA. 2020. Weighted likelihood to recover unbiased population estimates from a weighted sample. WorldPop, University of Southampton. <span>doi:10.5258/SOTON/WP00XXX</span>
+
+
+# License {-}
+You are free to redistribute this document under the terms of a <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution 4.0 International (CC BY 4.0)</a> license.  
+
+
+# References {-}
+
+<div id="refs"></div>
+
+
+
+# Appendix A: Supplementary Files {-}
+
+
+## Model Data {-}
+
+This sub-section describes all input data published as supplementary information.
+
+
+## Model Code {-}
+
+This sub-section describes all code published as supplementary information.
