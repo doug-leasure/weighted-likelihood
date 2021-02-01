@@ -3,32 +3,30 @@
 data{
   int<lower=0> n;                // sample size
   vector<lower=0>[n] N;          // observed counts
-  vector<lower=0,upper=1>[n] w;  // sampling weights
+  vector<lower=0,upper=1>[n] w;  // sampling weights (probability of selection)
 }
 
 transformed data{
   
   // inverse weights
-  vector<lower=0,upper=1>[n] w_inv;   
-  w_inv = inv(w) ./ sum(inv(w)); 
+  vector<lower=0,upper=1>[n] w_inv = inv(w) ./ sum(inv(w)); 
 }
 
 parameters{
   real med;              // median
-  real<lower=0> theta;  // naive variance component
+  real<lower=0> theta;   // naive variance component
 }
 
 transformed parameters{
   
   // location-specific weighted variance
-  vector<lower=0>[n] sigma; 
-  sigma = sqrt( inv( w_inv * pow(theta,-2) ) );
+  vector<lower=0>[n] w_sigma = sqrt( inv( w_inv * pow(theta,-2) ) );
 }
 
 model{
 
   // weighted likelihood
-  N ~ lognormal( log(med), sigma );
+  N ~ lognormal( log(med), w_sigma );
 
   // priors
   med ~ uniform(0, 1e3);
@@ -38,8 +36,7 @@ model{
 generated quantities {
   
   // weighted average sigma
-  real<lower=0> sigma_bar;
-  sigma_bar = sum( sigma .* sqrt(w_inv) ) / sum( sqrt(w_inv));
+  real<lower=0> sigma = sum( w_sigma .* sqrt(w_inv) ) / sum( sqrt(w_inv));
 }
 
 

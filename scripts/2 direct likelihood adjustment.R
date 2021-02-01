@@ -68,8 +68,10 @@ init <- function(c){
 }
 inits <- init(chains)
 
-# fit
-fit <- rstan::stan(file = 'models/model_B.stan',
+##--------------##
+
+# fit weighted precision version
+fitA <- rstan::stan(file = 'models/model_A.stan',
                    data = md,
                    chains = chains,
                    iter = warmup + iter,
@@ -79,30 +81,56 @@ fit <- rstan::stan(file = 'models/model_B.stan',
                    seed = md$seed)
 
 # trace plots
-rstan::traceplot(fit)
+rstan::traceplot(fitA)
 
 # fit to df
-df <- as.data.frame(fit)
+dfA <- as.data.frame(fitA)
 
 # predictions
-Nhat <- rlnorm(nrow(df), log(df$med), df$sigma)
+NhatA <- rlnorm(nrow(dfA), log(df$med), df$sigma)
+
+##--------------##
+
+# fit weighted likelihood version
+fitA <- rstan::stan(file = 'models/model_B.stan',
+                    data = md,
+                    chains = chains,
+                    iter = warmup + iter,
+                    warmup = warmup,
+                    pars = pars,
+                    init = inits,
+                    seed = md$seed)
+
+# trace plots
+rstan::traceplot(fitB)
+
+# fit to df
+dfB <- as.data.frame(fitB)
+
+# predictions
+NhatB <- rlnorm(nrow(dfB), log(df$med), df$sigma)
+
+##--------------##
 
 ## compare results: true population, sample data, model estimate
 
 # median
 median(population)
 median(pop_sample)
-median(Nhat)
+median(NhatA)
+median(NhatB)
 
 # mean
 mean(population)
 mean(pop_sample)
-mean(Nhat)
+mean(NhatA)
+mean(NhatB)
 
 # sd
 sd(population)
 sd(pop_sample)
-sd(Nhat)
+sd(NhatA)
+sd(NhatB)
 
 
 
