@@ -87,12 +87,12 @@ rstan::traceplot(fitA)
 dfA <- as.data.frame(fitA)
 
 # predictions
-NhatA <- rlnorm(nrow(dfA), log(df$med), df$sigma)
+NhatA <- rlnorm(nrow(dfA), log(dfA$med), dfA$sigma)
 
 ##--------------##
 
 # fit weighted likelihood version
-fitA <- rstan::stan(file = 'models/model_B.stan',
+fitB <- rstan::stan(file = 'models/model_B.stan',
                     data = md,
                     chains = chains,
                     iter = warmup + iter,
@@ -108,7 +108,7 @@ rstan::traceplot(fitB)
 dfB <- as.data.frame(fitB)
 
 # predictions
-NhatB <- rlnorm(nrow(dfB), log(df$med), df$sigma)
+NhatB <- rlnorm(nrow(dfB), log(dfB$med), dfB$sigma)
 
 ##--------------##
 
