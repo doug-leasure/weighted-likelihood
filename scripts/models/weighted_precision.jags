@@ -1,0 +1,22 @@
+model{
+  
+  for(i in 1:n){
+    
+    # likelihood
+    N[i] ~ dlnorm(log(med), log_tau[i])
+    
+    # log_tau = sample-specific estimate of precision (after weighting)
+    log_tau[i] <- pow(log_sigma,-2) * w[i]
+    log_sig[i] <- sqrt( 1 / log_tau[i] )
+  }
+  
+  ## PRIORS ##
+  
+  # log_sigma = log standard deviation (before weighting)
+  log_sigma ~ dunif(1e-3, 1)
+
+  ## DERIVED QUANTITIES ##
+  
+  # sigma = sqrt weighted average of log_sig among samples
+  sigma <- sum( log_sig * sqrt(w) ) / sum( sqrt(w))
+}

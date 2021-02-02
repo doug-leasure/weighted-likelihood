@@ -8,7 +8,7 @@ data{
 
 transformed data{
   
-  // inverse weights
+  // scaled inverse weights
   vector<lower=0,upper=1>[n] w_inv = inv(w) ./ sum(inv(w)); 
 }
 
@@ -19,7 +19,7 @@ parameters{
 
 transformed parameters{
   
-  // location-specific weighted variance
+  // location-specific weighted standard deviation
   vector<lower=0>[n] w_sigma = sqrt( inv( w_inv * pow(theta,-2) ) );
 }
 

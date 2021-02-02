@@ -71,7 +71,7 @@ inits <- init(chains)
 ##--------------##
 
 # fit weighted precision version
-fitA <- rstan::stan(file = 'models/model_A.stan',
+fitA <- rstan::stan(file = 'models/weighted_precision.stan',
                    data = md,
                    chains = chains,
                    iter = warmup + iter,
@@ -92,7 +92,7 @@ NhatA <- rlnorm(nrow(dfA), log(dfA$med), dfA$sigma)
 ##--------------##
 
 # fit weighted likelihood version
-fitB <- rstan::stan(file = 'models/model_B.stan',
+fitB <- rstan::stan(file = 'models/weighted_likelihood.stan',
                     data = md,
                     chains = chains,
                     iter = warmup + iter,
