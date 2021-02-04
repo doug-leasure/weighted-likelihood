@@ -138,7 +138,10 @@ fitC <- run.jags(model = 'models/weighted_precision.jags',
 coda::traceplot(fitC$mcmc)
 
 # fit to df
-dfC <- as.data.frame(fitC)
+dfC <- as.data.frame(fitC$mcmc[[1]])
+for(i in 2:length(fitC$mcmc)){
+  dfC <- rbind(dfC, fitC$mcmc[[i]])
+}
 
 # predictions
 NhatC <- rlnorm(nrow(dfC), log(dfC$med), dfC$sigma)
@@ -152,18 +155,21 @@ median(population)
 median(pop_sample)
 median(NhatA)
 median(NhatB)
+median(NhatC)
 
 # mean
 mean(population)
 mean(pop_sample)
 mean(NhatA)
 mean(NhatB)
+mean(NhatC)
 
 # sd
 sd(population)
 sd(pop_sample)
 sd(NhatA)
 sd(NhatB)
+sd(NhatC)
 
 
 
