@@ -8,3 +8,12 @@ This repository includes:
 3. code to fit models (stan and jags) to the sample data using weighted-likelihood, weighted-precision, and unweighted approaches
 4. code to assess results with figures and summary statistics
 5. a report to present the findings
+
+Original idea for weighted likelihood approach came from this post by Martyn Plummer on the JAGS forum:  
+https://sourceforge.net/p/mcmc-jags/discussion/610037/thread/50365933/
+
+Further discussion from Carpenter, Goodrich, and Gelman on the Stan Forum:  
+https://discourse.mc-stan.org/t/survey-weighted-regression/1654
+
+A relevant paper from Gelman:  
+https://projecteuclid.org/euclid.ss/1190905511
