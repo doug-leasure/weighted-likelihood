@@ -2,12 +2,12 @@
 rm(list=ls());gc();cat("\014");try(dev.off())
 
 # packages
-library(rstan)
+library(rstan);library(runjags)
 options(mc.cores = parallel::detectCores())
 rstan::rstan_options(auto_write = TRUE)
 
-# patch for stan glitch: https://discourse.mc-stan.org/t/new-error-cleanup-makevar-old-argument-rmu-is-missing-with-no-default/18137/21
-file.rename("~/.R/Makevars.win", "~/.R/Makevars.win.bak")
+# # patch for stan glitch: https://discourse.mc-stan.org/t/new-error-cleanup-makevar-old-argument-rmu-is-missing-with-no-default/18137/21
+# file.rename("~/.R/Makevars.win", "~/.R/Makevars.win.bak")
 
 # working directory
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
@@ -58,26 +58,35 @@ warmup <- 1000
 iter <- 1000
 
 # initials
-init <- function(c){
+init <- function(c, d){
   result <- list()
   for(i in 1:c){
     result[[i]] <- list(med = runif(1, 50, 500),
                         sigma = runif(1, 0, 0.5))
+    result[[i]]$theta <- sqrt( mean(d$w) / result[[i]]$sigma^-2 )
+    result[[i]]$.RNG.name = "lecuyer::RngStream" #"base::Wichmann-Hill"
+    result[[i]]$.RNG.seed = md$seed + c
   }
   return(result)
 }
-inits <- init(chains)
+rm_init <- function(rm_names, init_list){
+  for(i in 1:length(init_list)){
+    init_list[[i]] <- init_list[[i]][-which(names(init_list[[i]]) %in% rm_names)]
+  }
+  return(init_list)
+}
+inits <- init(chains, md)
 
 ##--------------##
 
-# fit weighted precision version
-fitA <- rstan::stan(file = 'models/weighted_precision.stan',
+# fit Stan weighted likelihood model
+fitA <- rstan::stan(file = 'models/weighted_likelihood.stan',
                    data = md,
                    chains = chains,
                    iter = warmup + iter,
                    warmup = warmup,
                    pars = pars,
-                   init = inits,
+                   init = rm_init(c('theta','.RNG.name','.RNG.seed'),inits),
                    seed = md$seed)
 
 # trace plots
@@ -91,14 +100,14 @@ NhatA <- rlnorm(nrow(dfA), log(dfA$med), dfA$sigma)
 
 ##--------------##
 
-# fit weighted likelihood version
-fitB <- rstan::stan(file = 'models/weighted_likelihood.stan',
+# fit Stan weighted precision model
+fitB <- rstan::stan(file = 'models/weighted_precision.stan',
                     data = md,
                     chains = chains,
                     iter = warmup + iter,
                     warmup = warmup,
                     pars = pars,
-                    init = inits,
+                    init = rm_init(c('sigma','.RNG.name','.RNG.seed'),inits),
                     seed = md$seed)
 
 # trace plots
@@ -109,6 +118,30 @@ dfB <- as.data.frame(fitB)
 
 # predictions
 NhatB <- rlnorm(nrow(dfB), log(dfB$med), dfB$sigma)
+
+##--------------##
+
+# fit JAGS weighted precision model
+fitC <- run.jags(model = 'models/weighted_precision.jags',
+                 data = md,
+                 n.chains = chains,
+                 sample = iter,
+                 burnin = warmup,
+                 monitor = pars,
+                 inits = rm_init('sigma',inits),
+                 thin = 1,
+                 summarise = F,
+                 method = 'parallel'
+  )
+
+# trace plots
+coda::traceplot(fitC$mcmc)
+
+# fit to df
+dfC <- as.data.frame(fitC)
+
+# predictions
+NhatC <- rlnorm(nrow(dfC), log(dfC$med), dfC$sigma)
 
 ##--------------##
 
