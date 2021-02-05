@@ -3,7 +3,7 @@
 data{
   int<lower=0> n;                // sample size
   vector<lower=0>[n] N;          // observed counts
-  vector<lower=0,upper=1>[n] w;  // sampling weights (probability of selection)
+  vector<lower=0,upper=1>[n] w;  // sampling probabilities
 }
 
 transformed data{
@@ -19,17 +19,17 @@ parameters{
 
 transformed parameters{
   
-  // location-specific weighted standard deviation
+  // location-specific weighted sigma
   vector<lower=0>[n] w_sigma = sqrt( inv( w_inv * pow(theta,-2) ) );
 }
 
 model{
 
-  // weighted likelihood
+  // likelihood
   N ~ lognormal( log(med), w_sigma );
 
   // priors
-  med ~ uniform(0, 1e3);
+  med ~ uniform(0, 2e3);
   theta ~ uniform(0, 1);
 }
 

@@ -9,8 +9,10 @@ model{
     w_tau[i] <- pow(theta,-2) * w_inv[i]
   }
   
-  # priors
-  med ~ dunif(0, 1e3)
+  # median
+  med ~ dunif(0, 2e3)
+  
+  # naive variance component
   theta ~ dunif(0, 1)
   
   # scaled inverse weight

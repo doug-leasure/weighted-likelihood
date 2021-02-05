@@ -3,7 +3,7 @@
 data{
   int<lower=0> n;                // sample size
   vector<lower=0>[n] N;          // observed counts
-  vector<lower=0,upper=1>[n] w;  // sampling weights (probability of selection)
+  vector<lower=0,upper=1>[n] w;  // sampling probabilities
 }
 
 parameters{
@@ -19,7 +19,7 @@ model{
   }
   
   // priors
-  med ~ uniform(0, 1e3);
+  med ~ uniform(0, 2e3);
   sigma ~ uniform(0, 5);
 }
 
