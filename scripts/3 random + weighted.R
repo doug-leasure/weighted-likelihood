@@ -20,7 +20,7 @@ set.seed(seed)
 
 # simulated population
 n <- 1e6    # total number of population units (e.g. 1 ha grid cells)
-med <- 200  # median population per unit
+med <- 250  # median population per unit
 sigma <- 0.5   # standard deviation of population among units (log scale)
 
 # simulated sample
@@ -341,20 +341,18 @@ plot(NA,
      xlim = l$xlim, 
      ylim = l$ylim)
 
-abline(v=med, lty=1, lwd=2, col='red')
+lines(d[['ru']], lty=1, lwd=2, col='darkgrey')
+lines(d[['wu']], lty=2, lwd=2, col='darkgrey')
+lines(d[['ww']], lty=1, lwd=2, col='black')
+lines(d[['cw']], lty=2, lwd=2, col='black')
 
-lines(d[['ru']], lty=1)
-lines(d[['wu']], lty=2)
-lines(d[['ww']], lty=3)
-lines(d[['cw']], lty=4)
+abline(v=med, lty=1, lwd=3, col='red')
 
 legend('topright', 
        legend = c('true','ru','wu','ww','cw'),
-       lty = c(1,1,2,3,4),
-       lwd = c(2,1,1,1,1),
-       col = c('red',rep('black',4)))
-
-
+       lty = c(1,1,2,1,2),
+       lwd = c(3,2,2,2,2),
+       col = c('red','darkgrey','darkgrey','black','black'))
 
 ## panel 2: mean 
 par(mar=c(4.5,4.5,1,1))
@@ -375,19 +373,12 @@ plot(NA,
      xlim = l$xlim, 
      ylim = l$ylim)
 
-abline(v=med*exp(sigma^2/2), lty=1, lwd=2, col='red')
+lines(d[['ru']], lty=1, lwd=2, col='darkgrey')
+lines(d[['wu']], lty=2, lwd=2, col='darkgrey')
+lines(d[['ww']], lty=1, lwd=2, col='black')
+lines(d[['cw']], lty=2, lwd=2, col='black')
 
-lines(d[['ru']], lty=1)
-lines(d[['wu']], lty=2)
-lines(d[['ww']], lty=3)
-lines(d[['cw']], lty=4)
-
-legend('topright', 
-       legend = c('true','ru','wu','ww','cw'),
-       lty = c(1,1,2,3,4),
-       lwd = c(2,1,1,1,1),
-       col = c('red',rep('black',4)))
-
+abline(v=med*exp(sigma^2/2), lty=1, lwd=3, col='red')
 
 ## panel 3: sigma 
 par(mar=c(4.5,4.5,1,1))
@@ -408,15 +399,16 @@ plot(NA,
      xlim = l$xlim, 
      ylim = l$ylim)
 
-abline(v=sigma, lwd=2, col='red')
+lines(d[['ru']], lty=1, lwd=2, col='darkgrey')
+lines(d[['wu']], lty=2, lwd=2, col='darkgrey')
+lines(d[['ww']], lty=1, lwd=2, col='black')
+lines(d[['cw']], lty=2, lwd=2, col='black')
 
-lines(d[['ru']], lty=1)
-lines(d[['wu']], lty=2)
-lines(d[['ww']], lty=3)
-lines(d[['cw']], lty=4)
+abline(v=sigma, lty=1, lwd=3, col='red')
 
 # save
 dev.off()
+
 
 
 
@@ -557,6 +549,7 @@ dev.off()
 
 
 
+
 ##-------- PLOT 3: TOTALS ---------####
 
 # load fitted models
@@ -567,18 +560,20 @@ df <- list(ru = as.data.frame(readRDS(file.path(outdir,'fit_random_unweighted.rd
 
 # prepare plot data
 totals <- data.frame(row.names=c('pop','ru','wu','ww','cw'), 
-                     total = rep(NA,5),
+                     mean = rep(NA,5),
+                     median = rep(NA,5),
                      lower = rep(NA,5),
                      upper = rep(NA,5))
-totals['pop','total'] <- sum(pop)
+totals['pop',] <- sum(pop)
 
-# posteriors
+### posterior sums ### SLOW
 for(mod in c('ru','wu','ww','cw')){
   tot <- rep(0, nrow(df[[mod]]))
   for(i in 1:n){
     tot <- tot + rlnorm(nrow(df[[mod]]), log(df[[mod]]$med), df[[mod]]$sigma)
   }
-  totals[mod,'total'] <- mean(tot)
+  totals[mod,'mean'] <- mean(tot)
+  totals[mod,'median'] <- median(tot)
   totals[mod,'lower'] <- quantile(tot, probs=0.025)
   totals[mod,'upper'] <- quantile(tot, probs=0.975)
   print(totals)
@@ -586,6 +581,8 @@ for(mod in c('ru','wu','ww','cw')){
 
 # save plot data
 write.csv(totals, file=file.path(outdir,'totals.csv'))
+
+###################
 
 # image file
 jpeg(file.path(outdir,'totals.jpg'), res=600, height=6, width=6, units='in')
@@ -595,13 +592,13 @@ bd <- as.matrix(totals[c('ru','wu','ww','cw'),])
 rownames(bd) <- rownames(totals)[-1]
 colnames(bd) <- colnames(totals)
 
-bp <- barplot(height=bd[,'total'],
+bp <- barplot(height=bd[,'mean'],
               main=NA,
               beside=T,
-              ylim=c(0,max(bd[,'upper'],na.rm=T)*1.02),
+              ylim=c(0,max(bd[,'upper'],na.rm=T)*1.1),
               ylab='Population Total')
 
-abline(h=totals['pop','total'])
+abline(h=totals['pop','mean'])
 
 row.names(bp) <- row.names(totals)[-1]
 colnames(bp) <- 'x'

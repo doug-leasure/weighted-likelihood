@@ -13,8 +13,9 @@ rstan::rstan_options(auto_write = TRUE)
 setwd(file.path(dirname(rstudioapi::getSourceEditorContext()$path),'../wd'))
 
 # simulation parameters
-meds <- c(100, 250, 500, 750, 1000) # c(100, 250, 500, 750, 1000)
-sigmas <- c(0.25, 0.5, 0.75, 1) # c(0.25, 0.5, 0.75, 1)
+n_population <- 1e6
+meds <- c(100, 250, 500) # c(100, 250, 500, 750, 1000)
+sigmas <- c(0.25, 0.5, 0.75) # c(0.25, 0.5, 0.75, 1)
 n <- 2e3
 
 # function: initials
@@ -51,13 +52,8 @@ myplot <- function(pop, dat, hatA, hatB, hatC){
             hatC = density(hatC))
   
   # axis limits
-  xlim <- range(d[[1]]$x)
-  for(i in 2:length(d)){
-    rng <- range(d[[i]]$x)
-    if(rng[1] < xlim[1]) xlim[1] <- rng[1]
-    if(rng[2] > xlim[2]) xlim[2] <- rng[2]
-  }
-  
+  xlim <- c(0, max(dat))
+
   ylim <- range(d[[1]]$y)
   for(i in 2:length(d)){
     rng <- range(d[[i]]$y)
@@ -103,7 +99,7 @@ for(med in meds){
     dir.create(outdir, recursive=T, showWarnings=F)
     
     # population count per 100 m pixel
-    population <- rlnorm(1e6, log(med), sigma)
+    population <- rlnorm(n_population, log(med), sigma)
     
     # sampling weights
     weights <- population

@@ -13,7 +13,7 @@ transformed data{
 }
 
 parameters{
-  real med;              // median
+  real<lower=0> med;     // median
   real<lower=0> theta;   // naive variance component
 }
 

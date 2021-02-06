@@ -6,7 +6,7 @@ data{
 }
 
 parameters{
-  real med;              // median (natural)
+  real<lower=0> med;              // median (natural)
   real<lower=0> sigma;   // standard deviation (log)
 }
 
@@ -16,7 +16,7 @@ model{
   N ~ lognormal(log(med), sigma);
   
   // priors
-  med ~ uniform(0, 1e3);
+  med ~ uniform(0, 2e3);
   sigma ~ uniform(0, 5);
 }
 

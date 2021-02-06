@@ -7,7 +7,7 @@ data{
 }
 
 parameters{
-  real med;              // median (natural)
+  real<lower=0> med;              // median (natural)
   real<lower=0> sigma;   // standard deviation (log)
 }
 
