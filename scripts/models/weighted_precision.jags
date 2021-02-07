@@ -19,5 +19,5 @@ model{
   m <- pow(w,-1) / sum(pow(w,-1))
   
   # weighted average sigma
-  sigma <- sum( sqrt( 1 / tau ) * sqrt(m) ) / sum( sqrt(m) )
+  sigma <- sum( pow(tau,-0.5) * sqrt(m) ) / sum( sqrt(m) )
 }
