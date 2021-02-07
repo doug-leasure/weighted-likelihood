@@ -8,8 +8,8 @@ data{
 
 transformed data{
   
-  // scaled inverse weights
-  vector<lower=0,upper=1>[n] w_inv = inv(w) ./ sum(inv(w)); 
+  // model weights (scaled inverse sampling weights)
+  vector<lower=0,upper=1>[n] m = inv(w) ./ sum(inv(w)); 
 }
 
 parameters{
@@ -19,14 +19,14 @@ parameters{
 
 transformed parameters{
   
-  // location-specific weighted sigma
-  vector<lower=0>[n] w_sigma = sqrt( inv( w_inv * pow(theta,-2) ) );
+  // location-specific weighted precision
+  vector<lower=0>[n] tau = m * pow(theta,-2);
 }
 
 model{
 
   // likelihood
-  N ~ lognormal( log(med), w_sigma );
+  N ~ lognormal( log(med), sqrt(inv(tau)) );
 
   // priors
   med ~ uniform(0, 2e3);
@@ -36,7 +36,7 @@ model{
 generated quantities {
   
   // weighted average sigma
-  real<lower=0> sigma = sum( w_sigma .* sqrt(w_inv) ) / sum( sqrt(w_inv));
+  real<lower=0> sigma = sum( sqrt(inv(tau)) .* sqrt(m) ) / sum( sqrt(m));
 }
 
 

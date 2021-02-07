@@ -3,10 +3,10 @@ model{
   for(i in 1:n){
     
     # likelihood
-    N[i] ~ dlnorm(log(med), w_tau[i])
+    N[i] ~ dlnorm(log(med), tau[i])
     
     # location-specific weighted precision
-    w_tau[i] <- pow(theta,-2) * w_inv[i]
+    tau[i] <- pow(theta,-2) * m[i]
   }
   
   # median
@@ -15,9 +15,9 @@ model{
   # naive variance component
   theta ~ dunif(0, 1)
   
-  # scaled inverse weight
-  w_inv <- pow(w,-1) / sum(pow(w,-1))
+  # model weight (scaled inverse sampling weight)
+  m <- pow(w,-1) / sum(pow(w,-1))
   
   # weighted average sigma
-  sigma <- sum( sqrt( 1 / w_tau ) * sqrt(w_inv) ) / sum( sqrt(w_inv) )
+  sigma <- sum( sqrt( 1 / tau ) * sqrt(m) ) / sum( sqrt(m) )
 }

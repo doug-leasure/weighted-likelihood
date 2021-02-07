@@ -64,7 +64,7 @@ myplot <- function(pop, dat, hatA, hatB, hatC){
   plot(NA, 
        main = NULL, 
        ylab = 'Probability Density', 
-       xlab = 'Value', 
+       xlab = 'People per Hectare', 
        xlim = xlim, 
        ylim = ylim)
   
@@ -133,7 +133,7 @@ for(med in meds){
     # mcmc
     pars <- c('med','sigma')
     chains <- 4
-    warmup <- 1500
+    warmup <- 1000
     iter <- 1000
 
     # initials

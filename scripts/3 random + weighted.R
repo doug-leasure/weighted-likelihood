@@ -123,7 +123,7 @@ rm(i_sample_random, i_sample_weighted)
 # mcmc
 pars <- c('med','sigma')
 chains <- 4
-warmup <- 500
+warmup <- 1000
 iter <- 1000
 
 # function: initials
@@ -200,7 +200,7 @@ fit <- rstan::stan(file = unweighted_model,
 
 # trace plots
 jpeg(file.path(outdir, 'trace_weighted_unweighted.jpg'))
-print(rstan::traceplot(fit))
+  print(rstan::traceplot(fit))
 dev.off()
 
 # predictions
@@ -289,6 +289,51 @@ rm(fit,hat,df,md)
 
 ##-------- PLOT 1: PARAMETERS ---------####
 
+# load data
+df <- list(ru = as.data.frame(readRDS(file.path(outdir,'fit_random_unweighted.rds'))),
+           wu = as.data.frame(readRDS(file.path(outdir,'fit_weighted_unweighted.rds'))),
+           ww = as.data.frame(readRDS(file.path(outdir,'fit_weighted_weighted.rds'))),
+           cw = as.data.frame(readRDS(file.path(outdir,'fit_combo_weighted.rds'))))
+
+md <- list(ru = readRDS(file.path(outdir,'md_random_unweighted.rds')),
+           wu = readRDS(file.path(outdir,'md_weighted_unweighted.rds')),
+           ww = readRDS(file.path(outdir,'md_weighted_weighted.rds')),
+           cw = readRDS(file.path(outdir,'md_combo_weighted.rds')))
+
+# tables of parameter estimates
+median_table <- 
+  mean_table <- 
+  sigma_table <- data.frame(row.names=c('pop','ru','wu','ww','cw'))
+
+median_table[,c('median','mean','lower','upper')] <- 
+  mean_table[,c('median','mean','lower','upper')] <- 
+  sigma_table[,c('median','mean','lower','upper')] <- NA
+
+median_table['pop',] <- med
+mean_table['pop',] <- med*exp(0.5*sigma^2)
+sigma_table['pop',] <- sigma
+
+for(name in names(df)){
+  median_table[name,'median'] <- median(df[[name]]$med)
+  median_table[name,'mean'] <- mean(df[[name]]$med)
+  median_table[name,c('lower','upper')] <- quantile(df[[name]]$med, probs=c(0.025,0.975))
+
+  mean_table[name,'median'] <- median(df[[name]]$med * exp(0.5*df[[name]]$sigma^2))
+  mean_table[name,'mean'] <- mean(df[[name]]$med * exp(0.5*df[[name]]$sigma^2))
+  mean_table[name,c('lower','upper')] <- quantile(df[[name]]$med * exp(0.5*df[[name]]$sigma^2), 
+                                                  probs=c(0.025,0.975))
+  
+  sigma_table[name,'median'] <- median(df[[name]]$sigma)
+  sigma_table[name,'mean'] <- mean(df[[name]]$sigma)
+  sigma_table[name,c('lower','upper')] <- quantile(df[[name]]$sigma, probs=c(0.025,0.975))
+  
+}
+
+# save tables
+write.csv(median_table, file=file.path(outdir, 'median_table.csv'))
+write.csv(mean_table, file=file.path(outdir, 'mean_table.csv'))
+write.csv(sigma_table, file=file.path(outdir, 'sigma_table.csv'))
+
 # function: axis limits
 lim <- function(x, prec=precision){
   xlim <- range(x[[1]]$x)
@@ -297,7 +342,7 @@ lim <- function(x, prec=precision){
     if(rng[1] < xlim[1]) xlim[1] <- rng[1]
     if(rng[2] > xlim[2]) xlim[2] <- rng[2]
   }
-  
+
   # ylim
   ylim <- range(x[[1]]$y)
   nmax_ylim <- ifelse(prec,length(x),2)
@@ -306,18 +351,12 @@ lim <- function(x, prec=precision){
     if(rng[1] < ylim[1]) ylim[1] <- rng[1]
     if(rng[2] > ylim[2]) ylim[2] <- rng[2]
   }
-  
+
   return(list(xlim=xlim, ylim=ylim))
 }
 
 # image file
-jpeg(file.path(outdir,'parameters.jpg'), res=300, height=6, width=6, units='in')
-
-# load data
-df <- list(ru = as.data.frame(readRDS(file.path(outdir,'fit_random_unweighted.rds'))),
-           wu = as.data.frame(readRDS(file.path(outdir,'fit_weighted_unweighted.rds'))),
-           ww = as.data.frame(readRDS(file.path(outdir,'fit_weighted_weighted.rds'))),
-           cw = as.data.frame(readRDS(file.path(outdir,'fit_combo_weighted.rds'))))
+jpeg(file.path(outdir,'parameters.jpg'), res=300, height=7, width=5, units='in')
 
 # panel layout
 layout(matrix(1:3, nrow=3, ncol=1, byrow=F), widths=c(1), heights=c(1,1,1))
@@ -333,11 +372,12 @@ d <- list(ru = density(df[['ru']]$med),
 
 # plot
 l <- lim(d, precision)
+l$xlim[2] <- l$xlim[2] * 1.05
 
 plot(NA, 
      main = NULL, 
      ylab = 'Probability Density', 
-     xlab = 'Median', 
+     xlab = expression(paste('Median ', mu)), 
      xlim = l$xlim, 
      ylim = l$ylim)
 
@@ -369,7 +409,7 @@ l <- lim(d, precision)
 plot(NA, 
      main = NULL, 
      ylab = 'Probability Density', 
-     xlab = 'Mean', 
+     xlab = expression(paste('Mean ', mu, e^(0.5 * sigma^2))), 
      xlim = l$xlim, 
      ylim = l$ylim)
 
@@ -395,7 +435,7 @@ l <- lim(d, precision)
 plot(NA, 
      main = NULL, 
      ylab = 'Probability Density', 
-     xlab = 'Standard Deviation', 
+     xlab = expression(paste('Standard Deviation ', sigma)), 
      xlim = l$xlim, 
      ylim = l$ylim)
 
@@ -559,11 +599,8 @@ df <- list(ru = as.data.frame(readRDS(file.path(outdir,'fit_random_unweighted.rd
            cw = as.data.frame(readRDS(file.path(outdir,'fit_combo_weighted.rds'))))
 
 # prepare plot data
-totals <- data.frame(row.names=c('pop','ru','wu','ww','cw'), 
-                     mean = rep(NA,5),
-                     median = rep(NA,5),
-                     lower = rep(NA,5),
-                     upper = rep(NA,5))
+totals <- data.frame(row.names=c('pop','ru','wu','ww','cw'))
+totals[,c('median','mean','lower','upper')] <- NA
 totals['pop',] <- sum(pop)
 
 ### posterior sums ### SLOW

@@ -3,6 +3,8 @@ author={},
 title={},
 year={},
 journal={},
+volume={},
+issue={},
 publisher={},
 doi={},
 note={}}
@@ -13,7 +15,23 @@ title={},
 year={},
 publisher={},
 address={},
+doi={},
 url={}}
+
+
+@manual{boo2020bottomup,
+author={WorldPop},
+title={{Bottom-up gridded population estimates for the Kinshasa, Kongo-Central, Kwango, Kwilu, and Mai-Ndombe provinces in the Democratic Republic of the Congo, version 1.0.}},
+year={2020},
+publisher={WorldPop, University of Southampton.},
+doi={10.5258/SOTON/WP00658}}
+
+@manual{boo2020modelled,
+author={Boo, G and Darin, E and Leasure, DR and Dooley, CA and Chamberlain, HR and Lazar, AN and Tatem, AJ.},
+title={{Modelled gridded population estimates for the Kinshasa, Kongo-Central, Kwango, Kwilu, and Mai-Ndombe provinces in the Democratic Republic of the Congo 2018, version 2.0.}},
+year={2020},
+publisher={WorldPop, University of Southampton.},
+doi={10.5258/SOTON/WP00669}}
 
 @Article{denwood2016runjags,
     title = {{runjags}: An {R} Package Providing Interface Utilities, Model Templates, Parallel Computing Methods and Additional Distributions for {MCMC} Models in {JAGS}},
@@ -25,8 +43,16 @@ url={}}
     pages = {1--25},
     doi = {10.18637/jss.v071.i09},
   }
-@article{dooley2020gridded,
-  title={Gridded maps of building patterns throughout sub-Saharan Africa, version 1.1.},
+
+@manual{dooley2020bottomup,
+author={WorldPop},
+title={{Bottom-up gridded population estimates for Zambia, version 1.0.}},
+year={2020},
+publisher={WorldPop, University of Southampton.},
+doi={10.5258/SOTON/WP00662}}
+
+@manual{dooley2020gridded,
+  title={{Gridded maps of building patterns throughout sub-Saharan Africa, version 1.1.}},
   author={Dooley, Claire A and Boo, Gianluca and Leasure, Douglas R and Tatem, Andrew J},
   year={2020},
   publisher={WorldPop, University of Southampton},
@@ -40,52 +66,17 @@ url={}}
   year={2019-2021}
 }
 
-@book{gss2010census,
-author={{Ghana Statistical Services}},
-title={Census enumeration area boundaries and urban/rural classification.},
-year={2010},
-publisher={Ghana Statistical Services},
-address={Accra, Ghana}}
-
-@book{leasure2020bayesian,
-author={Douglas R Leasure and Andrew J Tatem},
-title={Bayesian gridded population estimates for Ghana 2018, version 1.0},
-year={2020},
-publisher={WorldPop, University of Southampton},
-doi={10.5258/SOTON/WP00680},
-url={https://wopr.worldpop.org/?GHA/Population/v1.0}}
-
 @article{leasure2020national,
-  title={National population mapping from sparse survey data: A hierarchical Bayesian modeling framework to account for uncertainty},
+  title={{National population mapping from sparse survey data: A hierarchical Bayesian modeling framework to account for uncertainty}},
   author={Leasure, Douglas R and Jochem, Warren C and Weber, Eric M and Seaman, Vincent and Tatem, Andrew J},
   journal={Proceedings of the National Academy of Sciences},
   year={2020},
+  volume={117},
+  issue={39},
+  pages={24173--24179},
+  doi={10.1073/pnas.1913050117},
   publisher={National Acad Sciences}
 }
-
-@article{leasure2020peanutbutter,
-  title={peanutButter: An R package to produce rapid-response gridded population estimates from building footprints, version 0.3.0},
-  author={Douglas R Leasure and Claire A Dooley and Maksym Bondarenko and Andrew J Tatem },
-  year={2020},
-  publisher={WorldPop, University of Southampton},
-  doi={10.5258/SOTON/WP00681}
-}
-
-@book{leasure2020wopr,
-author={Douglas R Leasure and Maksym Bondarenko and Andrew J Tatem},
-title={wopr: An R package to query the WorldPop Open Population Repository, version 0.3.4},
-year={2020},
-publisher={WorldPop, University of Southampton},
-doi={10.5258/SOTON/WP00679},
-url={https://apps.worldpop.org/woprVision}}
-
-
-@book{mpc2019integrated,
-author={{Minnesota Population Center}},
-title={Integrated Public Use Microdata Series, International: Version 7.2 [Ghana 2010].},
-year={2019},
-publisher={IPUMS},
-address={Minneapolis, MN}}
 
 @inproceedings{plummer2003jags,
   title={JAGS: A program for analysis of Bayesian graphical models using Gibbs sampling},
@@ -101,7 +92,7 @@ address={Minneapolis, MN}}
 
 @book{r2020r,
 author={{R Core Team}},
-title={R: A language and environment for statistical computing},
+title={{R: A language and environment for statistical computing}},
 year={2020},
 publisher={R Foundation for Statistical Computing},
 address={Vienna, Austria},
@@ -109,13 +100,13 @@ url={https://www.R-project.org/}}
 
 @book{stan2019stan,
 author={{Stan Development Team}},
-title={Stan User's Guide},
+title={{Stan User's Guide}},
 year={2019},
 url={https://mc-stan.org/docs/2_23/stan-users-guide}}
 
 @book{stan2020rstan,
 author={{Stan Development Team}},
-title={RStan: the R interface to Stan. R package version 2.19.3.},
+title={{RStan: the R interface to Stan. R package version 2.19.3.}},
 year={2020},
 url={http://mc-stan.org/}}
 
@@ -144,19 +135,3 @@ url={http://mc-stan.org/}}
 	eprint = "\url{https://www.pnas.org/content/115/14/3529.full.pdf}",
 	journal = "\url{Proceedings of the National Academy of Sciences}"
 }
-
-@book{worldpop2018globala,
-author={{WorldPop (www.worldpop.org - School of Geography and Environmental Science, University of Southampton} and  {Department of Geography and Geosciences, University of Louisville} and {Departement de Geographie, Universite de Namur)} and {Center for International Earth Science Information Network (CIESIN), Columbia University}},
-title={Global High Resolution Population Denominators Project - Funded by The Bill and Melinda Gates Foundation (OPP1134076).},
-year={2018},
-publisher={WorldPop, University of Southampton},
-address={Southampton, UK},
-url={https://dx.doi.org/10.5258/SOTON/WP00651}}
-
-@book{worldpop2018globalb,
-author={{WorldPop (www.worldpop.org - School of Geography and Environmental Science, University of Southampton} and  {Department of Geography and Geosciences, University of Louisville} and {Departement de Geographie, Universite de Namur)} and {Center for International Earth Science Information Network (CIESIN), Columbia University}},
-title={Global High Resolution Population Denominators Project - Funded by The Bill and Melinda Gates Foundation (OPP1134076).},
-year={2018},
-publisher={WorldPop, University of Southampton},
-address={Southampton, UK},
-url={ftp://ftp.worldpop.org/GIS/Population/Global_2000_2020/CensusTables/}}
