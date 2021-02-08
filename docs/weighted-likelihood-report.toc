@@ -1,24 +1,22 @@
-\contentsline {section}{\numberline {1}Introduction}{2}{section.1}%
-\contentsline {section}{\numberline {2}Methods}{2}{section.2}%
-\contentsline {subsection}{\numberline {2.1}Simulated Populations}{2}{subsection.2.1}%
-\contentsline {subsection}{\numberline {2.2}Simulated Survey Data}{4}{subsection.2.2}%
-\contentsline {subsubsection}{\numberline {2.2.1}Random Sample}{4}{subsubsection.2.2.1}%
-\contentsline {subsubsection}{\numberline {2.2.2}Population-weighted Sample}{4}{subsubsection.2.2.2}%
-\contentsline {subsubsection}{\numberline {2.2.3}Combined Sample}{5}{subsubsection.2.2.3}%
-\contentsline {subsection}{\numberline {2.3}Statistical Models}{5}{subsection.2.3}%
-\contentsline {subsubsection}{\numberline {2.3.1}Unweighted Log-normal}{6}{subsubsection.2.3.1}%
-\contentsline {subsubsection}{\numberline {2.3.2}Weighted-likelihood}{6}{subsubsection.2.3.2}%
-\contentsline {subsubsection}{\numberline {2.3.3}Weighted-precision (Stan)}{7}{subsubsection.2.3.3}%
-\contentsline {subsubsection}{\numberline {2.3.4}Weighted-precision (JAGS)}{8}{subsubsection.2.3.4}%
-\contentsline {subsection}{\numberline {2.4}Population Totals}{9}{subsection.2.4}%
-\contentsline {section}{\numberline {3}Results}{9}{section.3}%
-\contentsline {section}{\numberline {4}Discussion}{10}{section.4}%
-\contentsline {section}{Contributing}{11}{section*.2}%
-\contentsline {subsection}{Suggested Citation}{11}{section*.3}%
-\contentsline {subsection}{License}{11}{section*.4}%
-\contentsline {section}{References}{11}{section*.5}%
-\contentsline {section}{\numberline {5}Tables}{13}{section.5}%
-\contentsline {subsection}{\numberline {5.1}Weighted-precision Model}{13}{subsection.5.1}%
-\contentsline {subsection}{\numberline {5.2}Weighted-likelihood Model}{14}{subsection.5.2}%
-\contentsline {section}{\numberline {6}Figures}{15}{section.6}%
-\contentsline {section}{Appendix A: Supplementary Code}{21}{section*.6}%
+\contentsline {section}{Introduction}{2}{section*.2}%
+\contentsline {section}{Methods}{2}{section*.3}%
+\contentsline {subsection}{Simulated Populations}{2}{section*.4}%
+\contentsline {subsection}{Simulated Survey Data}{4}{section*.5}%
+\contentsline {subsubsection}{Random Sample}{4}{section*.6}%
+\contentsline {subsubsection}{Population-weighted Sample}{4}{section*.7}%
+\contentsline {subsubsection}{Combined Sample}{5}{section*.8}%
+\contentsline {subsection}{Statistical Models}{5}{section*.9}%
+\contentsline {subsubsection}{Unweighted Log-normal}{6}{section*.10}%
+\contentsline {subsubsection}{Weighted-likelihood}{6}{section*.11}%
+\contentsline {subsubsection}{Weighted-precision (Stan)}{7}{section*.12}%
+\contentsline {subsubsection}{Weighted-precision (JAGS)}{8}{section*.13}%
+\contentsline {subsection}{Population Totals}{9}{section*.14}%
+\contentsline {section}{Results}{9}{section*.15}%
+\contentsline {section}{Discussion}{10}{section*.16}%
+\contentsline {section}{Contributing}{11}{section*.17}%
+\contentsline {subsection}{Suggested Citation}{11}{section*.18}%
+\contentsline {subsection}{License}{11}{section*.19}%
+\contentsline {section}{References}{11}{section*.20}%
+\contentsline {section}{Tables}{13}{section*.21}%
+\contentsline {section}{Figures}{15}{section*.22}%
+\contentsline {section}{Appendix A: Supplementary Code}{21}{section*.23}%

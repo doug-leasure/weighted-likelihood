@@ -142,7 +142,7 @@ for(med in meds){
     ##--------------##
     
     # fit Stan weighted likelihood model
-    fitA <- rstan::stan(file = '../scripts/models/weighted_likelihood.stan',
+    fitA <- rstan::stan(file = '../models/weighted_likelihood.stan',
                         data = md,
                         chains = chains,
                         iter = warmup + iter,
@@ -166,7 +166,7 @@ for(med in meds){
     ##--------------##
     
     # fit Stan weighted precision model
-    fitB <- rstan::stan(file = '../scripts/models/weighted_precision.stan',
+    fitB <- rstan::stan(file = '../models/weighted_precision.stan',
                         data = md,
                         chains = chains,
                         iter = warmup + iter,
@@ -189,7 +189,7 @@ for(med in meds){
     ##--------------##
     
     # fit JAGS weighted precision model
-    fitC <- run.jags(model = '../scripts/models/weighted_precision.jags',
+    fitC <- run.jags(model = '../models/weighted_precision.jags',
                      data = md,
                      n.chains = chains,
                      sample = iter,

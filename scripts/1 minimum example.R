@@ -69,7 +69,7 @@ init <- function(c){
 inits <- init(chains)
 
 # fit
-fit <- rstan::stan(file = 'models/weighted_likelihood.stan',
+fit <- rstan::stan(file = '../models/weighted_likelihood.stan',
                    data = md,
                    chains = chains,
                    iter = warmup + iter,
