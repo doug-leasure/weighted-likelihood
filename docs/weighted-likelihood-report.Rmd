@@ -1,5 +1,5 @@
 ---
-title: "A simulation study exploring weighted likelihood models to recover unbiased population estimates from weighted survey data."
+title: "A simulation study exploring weighted Bayesian models to recover unbiased population estimates from weighted survey data."
 author: "WorldPop, University of Southampton"
 date: "`r format(Sys.time(), '%d %B %Y')`"
 always_allow_html: true
@@ -379,7 +379,7 @@ This analysis and report were developed by Doug Leasure and Claire Dooley from t
 
 ## Suggested Citation {-}
 
-Leasure DR, Dooley CA, Tatem AJ. 2021. A simulation study exploring weighted likelihood models to recover unbiased population estimates from weighted survey data. WorldPop, University of Southampton. <span>doi:10.5258/SOTON/WP00706</span>
+Leasure DR, Dooley CA, Tatem AJ. 2021. A simulation study exploring weighted Bayesian models to recover unbiased population estimates from weighted survey data. WorldPop, University of Southampton. <span>doi:10.5258/SOTON/WP00706</span>
 
 
 ## License {-}
