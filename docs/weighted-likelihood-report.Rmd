@@ -25,20 +25,20 @@ knitr::opts_chunk$set(fig.pos = "!h", out.extra = "", fig.align='center')
 
 Statistical models used to map population estimates across the landscape require observations of population counts from a representative sample of locations to use as training data.  These data usually come from household surveys in which populations are enumerated within geographically-defined survey locations.  A stratified random sample is ideal for recovering unbiased estimates of the mean and variance of population densities.  However, household surveys often implement a PPS sampling design (Probability Proportional to Size) in which locations with higher population densities are more likely to be included in the sample.  This will result in biased estimates of average population densities for population modelling.  Population-weighted sampling is intended to approximate random samples of *individuals* or *households* from sets of geographically clustered households, but it does not produce random samples of *locations* needed for geographical population models. 
 
-Our objectives here are to:  
+Our objectives here were to:  
 
 1. Demonstrate that a population-weighted sample results in biased estimates of population densities,
 2. Demonstrate that model-based estimates of population totals for large areas are sensitive to this bias,
 3. Explore Bayesian weighted-likelihood and weighted-precision approaches to produce unbiased parameter estimates, and
 4. Demonstrate that weighted models can recover unbiased estimates of population densities and population totals from a population-weighted sample.
 
-This analysis is intended as a theoretical foundation to support ongoing development of statistical models to estimate and map population sizes using weighted survey data as inputs. 
+This analysis was intended as a theoretical foundation to support ongoing development of statistical models to estimate and map population sizes using weighted survey data as inputs. 
 
 # Methods
 
-We simulated populations by drawing population densities for each location from a distribution with known parameters. We then produced various types of samples from those populations: random, population-weighted, or a combination. Every population included one million locations and every sample included 2000 locations. We fit three types of models to these data trying to recover the known population parameters: unweighted model, weighted-precision model, and weigthed-likelihood model.
+We simulated populations by drawing population densities for each location from a distribution with known parameters. We then produced various types of samples from those populations: random, population-weighted, or a combination. Every population included one million locations and every sample included 2000 locations. We fit three types of models to these data trying to recover the known population parameters: unweighted model, weighted-precision model, and weighted-likelihood model.
 
-All simulations were conducted using the R statistical programming environment [@r2020r]. Statistical models were fit using either the *RStan* R package [@stan2020rstan; @stan2019stan] or the *runjags* R package [@denwood2016runjags; @plummer2003jags].
+All simulations were conducted using the R statistical programming environment [@r2020r]. Statistical models were fit using either the *RStan* R package [@stan2020rstan] with the Stan probabilistic programming language [@stan2019stan] or the *runjags* R package [@denwood2016runjags] with JAGS software [@plummer2003jags].
 
 ## Simulated Populations
 
@@ -57,7 +57,7 @@ In this model, $N_i$ was the observed population count and $A_i$ was the observe
 
 The intended purpose of Eq. \@ref(eq:pnas) was to estimate model parameters based on observed population data. For the purposes of the current simulation study, we reversed that logic. We provided pre-defined parameter values to generate simulated population data.
 
-For our simulations we made a series of simplifying assumptions to this model. We assumed that every location $i$ included one hectare of settled area (i.e. $A_i = 1$) and we ignored the Poisson variation so that $N_i = D_i$. We also ignored the effects of settlement type, geographic location, and covariates so that $t$, $g$, and $x_{k,i}$ were dropped from the model. These simplifying assumptions allowed us to isolate the effects of weighted sampling in the absence of these potentially confounding effects. While beyond the scope of the current report, relaxing these assumptions and assessing their effects should be the focus of future theoretical and empirical studies.
+For our simulations we made a series of simplifying assumptions to this model. We assumed that every location $i$ included one hectare of settled area (i.e. $A_i = 1$) and we ignored the Poisson variation so that $N_i = D_i$. We also ignored the effects of settlement type $t$, geographic location $g$, and covariates $x_{k,i}$ so that they were dropped from the model. These simplifying assumptions allowed us to isolate the effects of weighted sampling in the absence of these potentially confounding effects. While beyond the scope of the current report, relaxing these assumptions and assessing their effects should be the focus of future theoretical and empirical studies.
 
 The simplified model used for our simulations was:
 
@@ -73,10 +73,17 @@ We simulated population densities (i.e. people per hectare) at one million locat
 Following Eq. \@ref(eq:simulation), a population where $\mu = 250$ and $\sigma=0.5$ can be simulated across one million locations using the following R code:
 
 ```{r}
-# simulate population densities at one million locations
-pop <- rlnorm(n = 1e6, 
-              meanlog = log(200),
-              sdlog = 0.5)
+# population parameters
+mu <- 250
+sigma <- 0.5
+
+# number of locations in full population
+pop_n <- 1e6
+
+# simulate population densities at all locations
+pop <- rlnorm(n = pop_n, 
+              meanlog = log(mu),
+              sdlog = sigma)
 
 # plot distribution of population densities
 hist(pop)
@@ -85,35 +92,36 @@ hist(pop)
 
 ## Simulated Survey Data
 
-We simulated three sampling designs:
+We simulated three sampling designs, always with a sample size of 2000 locations:
 	
 1. Random sampling, 
 2. Population-weighted sampling, and
 3. A combination of random and population-weighted sampling.
-
-We always used a sample size of 2000 locations. We used the following R code to draw these samples.
 
 ### Random Sample
 
 The random sample was simply drawn using the *sample* function to draw 2000 samples without replacement from the simulated population densities:
 
 ```{r, eval=F}
+# sample size (number of locations)
+n <- 2e3
+
 # random sample
 D <- sample(x = pop,
-            n = 2e3)
+            n = n)
 ```
 
 ### Population-weighted Sample
 
-To draw a population-weighted sample, we must first calculate sampling probabilities that are based on the population density at each location.
+To draw a population-weighted sample, we first calculated sampling probabilities based on the population density at each location. These were then used to draw a weighted (i.e. non-random) sample from the population in which locations with higher population densities were over-represented.
 
 ```{r, eval=F}
 # sampling weights based on population density 
 w <- pop / sum(pop)
 
 # select locations for a weighted sample
-i <- sample(x = 1:length(pop),
-            size = 2e3,
+i <- sample(x = 1:pop_n,
+            size = n,
             prob = w)
 
 # population densities at selected locations
@@ -122,20 +130,20 @@ D <- pop[i]
 
 ### Combined Sample
 
-Combined samples (random and weighted) were produced using several different proportions of random samples (i.e. 0.2, 0.5, 0.8). The total sample size for combined samples was always 2000.
+Combined samples (random and weighted) were produced using several different proportions of random samples (i.e. 0.2, 0.5, 0.8). 
 
 ```{r, eval=F}
 # proportion random
 prop <- 0.5
 
 # select locations for weighted sample
-i <- sample(x = 1:length(pop),
-            size = 2e3*(1-prop),
+i <- sample(x = 1:pop_n,
+            size = n*(1-prop),
             prob = w)
 
 # select locations for random sample
-j <- sample(x = 1:length(pop)[-i],
-            size = 2e3*prop)
+j <- sample(x = (1:pop_n)[-i],
+            size = n*prop)
 
 # weights for selected locations in weighted sample
 w_i <- w[i]
@@ -147,7 +155,7 @@ w_j <- rep(x = mean(w_i),
 # population densities at selected locations
 D <- pop[ c(i,j) ]
 ```
-Notice that we assigned equal weights to all of the random samples that were equal to the mean weight among the weighted samples. In other words, each random sample was given an equal weight in the model comparable to an average weighted sample. This balanced the influence of the random and weighted portions of the sample.
+Notice that we assigned equal weights to all of the random samples that were equal to the mean weight among the weighted samples. In other words, each random sample was given an equal weight in the model comparable to an average weighted sample. This was intended to balance the influence of the random and weighted portions of the sample.
 
 ## Statistical Models
 
@@ -160,7 +168,7 @@ We evaluated four statistical models:
 
 The unweighted model was included to evaluate the bias that arises when fitting an unweighted model to population-weighted sample data. The weighted-precision and weighted-likelihood models were designed to use sample weights to recover unbiased estimates of population parameters from a weighted sample. We developed the weighted-precision model for both Stan and JAGs to demonstrate that both implementations produced the same results and to provide example code for both. The weighted-likelihood approach required a direct adjustment to the likelihood that was not possible to implement in JAGS. 
 
-All models were run with four MCMC chains including a burnin period of 1000 iterations and an additional 1000 iterations that were retained for analysis. MCMC chains for all models achieved convergence. For JAGS models, convergence was defined as Gelman-Rubin statistics (potential scale reduction factors) that were less than 1.1 for all parameters [@gelman1992inference]. For Stan models, convergence was defined as R-hat parameters less than 1.01 for all parameters [@stan2020rstan] (https://mc-stan.org/rstan/reference/Rhat.html). 
+All models were run with four MCMC chains including a burnin period of 1000 iterations and an additional 1000 iterations that were retained for analysis. MCMC chains for all models achieved convergence. For JAGS models, convergence was defined as Gelman-Rubin statistics (potential scale reduction factors) that were less than 1.1 for all parameters [@gelman1992inference]. For Stan models, convergence was defined as R-hat less than 1.05 [@stan2020rstan] (https://mc-stan.org/rstan/reference/Rhat.html). 
 
 ### Unweighted Log-normal
 
@@ -173,22 +181,22 @@ Our simplest model was a log-normal with no weights:
 
 Notice that this is identical to Eq. \@ref(eq:simulation) that was used to generate our simulated populations. Our implementation used the following Stan model:
 
-```
+```{r, eval=F}
 data{
-  int<lower=0> n;         // sample size
-  vector<lower=0>[n] D;   // observed population densities
+  int<lower=0> n;         # sample size
+  vector<lower=0>[n] D;   # observed population densities
 }
 
 parameters{
-  real<lower=0> mu;      // median (natural)
-  real<lower=0> sigma;   // standard deviation (log)
+  real<lower=0> mu;      # median (natural)
+  real<lower=0> sigma;   # standard deviation (log)
 }
 
 model{
-  D ~ lognormal(log(mu), sigma);  // likelihood
+  D ~ lognormal(log(mu), sigma);  # likelihood
   
-  mu ~ uniform(0, 2e3);   // prior for mu
-  sigma ~ uniform(0, 5);  // prior for sigma
+  mu ~ uniform(0, 2e3);   # prior for mu
+  sigma ~ uniform(0, 5);  # prior for sigma
 }
 ```
 
@@ -196,27 +204,27 @@ model{
 
 The weighted-likelihood approach used the same log-normal model but implemented an adjustment to the likelihood for each sample based on the sample weights to account for the increased probability of including locations with high population densities in the weighted sample. We implemented this model in Stan:
 
-```
+```{r, eval=F}
 data{
-  int<lower=0> n;                // sample size
-  vector<lower=0>[n] D;          // observed population densities
-  vector<lower=0,upper=1>[n] w;  // sampling probabilities (weights)
+  int<lower=0> n;                # sample size
+  vector<lower=0>[n] D;          # observed population densities
+  vector<lower=0,upper=1>[n] w;  # sampling probabilities (weights)
 }
 
 parameters{
-  real<lower=0> mu;      // median (natural)
-  real<lower=0> sigma;   // standard deviation (log)
+  real<lower=0> mu;      # median (natural)
+  real<lower=0> sigma;   # standard deviation (log)
 }
 
 model{
 
-  // weighted likelihood
+  # weighted likelihood
   for(i in 1:n){
     target += lognormal_lpdf( D[i] | log(mu), sigma ) / w[i];  
   }
   
-  mu ~ uniform(0, 2e3);   // prior for mu
-  sigma ~ uniform(0, 5);  // prior for sigma
+  mu ~ uniform(0, 2e3);   # prior for mu
+  sigma ~ uniform(0, 5);  # prior for sigma
 }
 
 ```
@@ -263,42 +271,42 @@ We used $\sqrt{m_i}$ for this weighted average so that the weights are on the sa
 
 Here we implemented the weighted-precision model in Stan:
 
-```
+```{r, eval=F}
 data{
-  int<lower=0> n;                // sample size
-  vector<lower=0>[n] D;          // observed counts
-  vector<lower=0,upper=1>[n] w;  // sampling probabilities
+  int<lower=0> n;                # sample size
+  vector<lower=0>[n] D;          # observed counts
+  vector<lower=0,upper=1>[n] w;  # sampling probabilities
 }
 
 transformed data{
   
-  // model weights (scaled inverse sampling weights)
+  # model weights (scaled inverse sampling weights)
   vector<lower=0,upper=1>[n] m = inv(w) ./ sum(inv(w)); 
 }
 
 parameters{
-  real<lower=0> mu;      // median
-  real<lower=0> theta;   // naive standard deviation
+  real<lower=0> mu;      # median
+  real<lower=0> theta;   # naive standard deviation
 }
 
 transformed parameters{
   
-  // location-specific weighted precision
-  vector<lower=0>[n] tau = m * pow(theta,-2) ;
+  # location-specific weighted precision
+  vector<lower=0>[n] tau = m * pow(theta,-2);
 }
 
 model{
   
-  // likelihood with weighted precision
+  # likelihood with weighted precision
   D ~ lognormal( log(mu), sqrt(inv(tau)) ); 
   
-  mu ~ uniform(0, 2e3);  // prior median
-  theta ~ uniform(0, 1); // prior naive standard deviation
+  mu ~ uniform(0, 2e3);  # prior median
+  theta ~ uniform(0, 1); # prior naive standard deviation
 }
 
 generated quantities {
   
-  // weighted average global sigma
+  # weighted average global sigma
   real<lower=0> sigma = sum( sqrt(inv(tau)) .* sqrt(m) ) / sum( sqrt(m));
 }
 ```
@@ -308,7 +316,7 @@ generated quantities {
 
 We also implemented the weighted-precision model using JAGS software to provide an example of the coding differences and to demonstrate that they produce the same results. JAGS parameterizes the log-normal distribution using precision rather than standard deviation (as in Stan). 
 
-```
+```{r, eval=F}
 model{
   
   # model weights (scaled inverse sampling weights)
@@ -370,7 +378,7 @@ We defined the sampling weights as the probability of a location being selected 
 
 Weighted-precision models were used to produce 100 m gridded population estimates for Zambia [@dooley2020bottomup] and Democratic Republic of the Congo [@boo2020modelled; @boo2020bottomup]. These publications implemented a full version of the weighted-precision model that extended the core model of Leasure et al [-@leasure2020national] (Eq. \@ref(eq:pnas)) to account for population-weighted sample data while also accounting for geographical location, settlement type (urban/rural), building footprints, and other geospatial covariates.
 
-The weighted-likelihood approach seemed to produce point-estimates rather than true Bayesian posterior distributions that accounted for paramater uncertainty (Fig. \@ref(fig:parameters-likelihood)). This was presumedly the result of the direct modification of the likelihood in the Stan model (see section [Weighted-likelihood]). This implementation of weighted-likelihood is not advised for adjusting a log-normal distribution, but it may be appropriate for discrete distributions, like Poisson, where sufficient statistics are appropriate (See "Exploiting sufficient statistics" in the "Efficiency Tuning" chapter of Stan User Guide [-@stan2019stan]). More investigation is needed on this topic to determine if this approach may be suitable for the one-inflated Poisson models [@leasure2020approach] developed to produce full coverage gridded population estimates of people per household from census microdata [@mpc2019integrated], which sometimes include weighted samples.
+The weighted-likelihood approach seemed to produce point-estimates rather than true Bayesian posterior distributions that accounted for paramater uncertainty (Fig. \@ref(fig:parameters-likelihood)). This was presumedly the result of the direct modification of the likelihood in the Stan model (see section [Weighted-likelihood]). This implementation of weighted-likelihood is not advised for adjusting a log-normal distribution, but it may perform better for discrete distributions where sufficient statistics are appropriate (See "Exploiting sufficient statistics" in the "Efficiency Tuning" chapter of the Stan User Guide [-@stan2019stan]). More investigation is needed on this topic to determine if this approach may be suitable for the one-inflated Poisson models [@leasure2020approach] developed to produce full coverage gridded population estimates of people per household from census microdata [@mpc2019integrated], which sometimes include weighted samples.
 
 
 # Contributing {-}

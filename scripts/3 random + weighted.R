@@ -25,11 +25,11 @@ sigma <- 0.5   # standard deviation of population among units (log scale)
 
 # simulated sample
 n_sample <- 2e3     # total sample size
-prop_random <- 0.5  # proportion of sample that is random (for combined sample only)
+prop_random <- 0.8  # proportion of sample that is random (for combined sample only)
 
 # models
-weighted_model <- '../scripts/models/weighted_precision.stan' 
-precision <- T
+weighted_model <- '../scripts/models/weighted_likelihood.stan' 
+precision <- F
 
 unweighted_model <- '../scripts/models/unweighted.stan'
 
