@@ -1,24 +1,24 @@
-\contentsline {section}{\numberline {1}Introduction}{1}{section.1}%
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}%
 \contentsline {section}{\numberline {2}Methods}{2}{section.2}%
 \contentsline {subsection}{\numberline {2.1}Simulated Populations}{2}{subsection.2.1}%
 \contentsline {subsection}{\numberline {2.2}Simulated Survey Data}{4}{subsection.2.2}%
 \contentsline {subsubsection}{\numberline {2.2.1}Random Sample}{4}{subsubsection.2.2.1}%
 \contentsline {subsubsection}{\numberline {2.2.2}Population-weighted Sample}{4}{subsubsection.2.2.2}%
-\contentsline {subsubsection}{\numberline {2.2.3}Combined Sample}{4}{subsubsection.2.2.3}%
+\contentsline {subsubsection}{\numberline {2.2.3}Combined Sample}{5}{subsubsection.2.2.3}%
 \contentsline {subsection}{\numberline {2.3}Statistical Models}{5}{subsection.2.3}%
-\contentsline {subsubsection}{\numberline {2.3.1}Unweighted Log-normal}{5}{subsubsection.2.3.1}%
+\contentsline {subsubsection}{\numberline {2.3.1}Unweighted Log-normal}{6}{subsubsection.2.3.1}%
 \contentsline {subsubsection}{\numberline {2.3.2}Weighted-likelihood}{6}{subsubsection.2.3.2}%
-\contentsline {subsubsection}{\numberline {2.3.3}Weighted-precision (Stan)}{6}{subsubsection.2.3.3}%
+\contentsline {subsubsection}{\numberline {2.3.3}Weighted-precision (Stan)}{7}{subsubsection.2.3.3}%
 \contentsline {subsubsection}{\numberline {2.3.4}Weighted-precision (JAGS)}{8}{subsubsection.2.3.4}%
-\contentsline {subsection}{\numberline {2.4}Population Totals}{8}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.4}Population Totals}{9}{subsection.2.4}%
 \contentsline {section}{\numberline {3}Results}{9}{section.3}%
-\contentsline {section}{\numberline {4}Discussion}{9}{section.4}%
-\contentsline {section}{Contributing}{10}{section*.2}%
-\contentsline {subsection}{Suggested Citation}{10}{section*.3}%
-\contentsline {subsection}{License}{10}{section*.4}%
-\contentsline {section}{References}{10}{section*.5}%
-\contentsline {section}{\numberline {5}Tables}{11}{section.5}%
-\contentsline {subsection}{\numberline {5.1}Weighted-precision Model}{11}{subsection.5.1}%
-\contentsline {subsection}{\numberline {5.2}Weighted-likelihood Model}{12}{subsection.5.2}%
-\contentsline {section}{\numberline {6}Figures}{13}{section.6}%
-\contentsline {section}{Appendix A: Supplementary Code}{19}{section*.6}%
+\contentsline {section}{\numberline {4}Discussion}{10}{section.4}%
+\contentsline {section}{Contributing}{11}{section*.2}%
+\contentsline {subsection}{Suggested Citation}{11}{section*.3}%
+\contentsline {subsection}{License}{11}{section*.4}%
+\contentsline {section}{References}{11}{section*.5}%
+\contentsline {section}{\numberline {5}Tables}{13}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Weighted-precision Model}{13}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Weighted-likelihood Model}{14}{subsection.5.2}%
+\contentsline {section}{\numberline {6}Figures}{15}{section.6}%
+\contentsline {section}{Appendix A: Supplementary Code}{21}{section*.6}%
