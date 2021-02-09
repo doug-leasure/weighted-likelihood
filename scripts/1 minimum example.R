@@ -13,7 +13,7 @@ file.rename("~/.R/Makevars.win", "~/.R/Makevars.win.bak")
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 # simulation parameters
-med <- 200
+med <- 250
 sd <- 0.5
 
 # population count per 100 m pixel
@@ -69,7 +69,7 @@ init <- function(c){
 inits <- init(chains)
 
 # fit
-fit <- rstan::stan(file = '../models/weighted_likelihood.stan',
+fit <- rstan::stan(file = '../models/weighted_likelihood_test.stan',
                    data = md,
                    chains = chains,
                    iter = warmup + iter,
