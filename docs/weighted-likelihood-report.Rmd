@@ -23,7 +23,7 @@ knitr::opts_chunk$set(fig.pos = "!h", out.extra = "", fig.align='center')
 
 # Introduction {-}
 
-Statistical models used to map estimates of population counts across the landscape require observations of population counts from a representative sample of locations to use as training data.  These data usually come from household surveys in which populations are enumerated within geographically-defined survey locations.  A stratified random sample is ideal for recovering unbiased estimates of the mean and variance of population densities.  However, national household surveys (e.g. Demographic and Health Surveys or Living Standards Measurement Surveys) often implement a PPS sampling design (Probability Proportional to Size) in which locations with higher population densities are more likely to be included in the sample compared to a random sample.  This will result in biased estimates of average population densities for population modelling.  Population-weighted sampling is intended to approximate random samples of *individuals* or *households* from sets of geographically clustered households, but it does not produce random samples of *locations* (and therefore population sizes) needed for geographical population models. 
+Statistical models used to map estimates of population counts across the landscape require observations of population counts from a representative sample of locations to use as training data.  These data usually come from household surveys in which populations are enumerated within geographically defined survey locations.  A stratified random sample is ideal for recovering unbiased estimates of the mean and variance of population densities.  However, national household surveys (e.g. Demographic and Health Surveys or Living Standards Measurement Surveys) often implement a PPS sampling design (Probability Proportional to Size) in which locations with higher population densities are more likely to be included in the sample compared to a random sample.  This will result in biased estimates of average population densities for population modelling.  Population-weighted sampling is intended to approximate random samples of *individuals* or *households* from sets of geographically clustered households, but it does not produce random samples of *locations* (and therefore population sizes) needed for geographical population models. 
 
 Our objectives here were to:  
 
@@ -68,7 +68,7 @@ The simplified model used for our simulations was:
 
 > Note: We modelled the median $\mu$ on the natural scale so that the parameter estimate was easier to interpret (i.e. average population densities), but we kept $\sigma$ on the log-scale to simplify the equations. 
 
-We simulated population densities (i.e. people per hectare) at one million locations by taking one million draws from this log-normal distribution. We repeated this for a range of parameter values for $\mu$ (i.e. 100, 250, 500) and $\sigma$ (i.e. 0.25, 0.5, 0.75). 
+We simulated population densities (i.e. count of people per hectare) at one million locations by taking one million draws from this log-normal distribution. We repeated this for a range of parameter values for $\mu$ (i.e. 100, 250, 500) and $\sigma$ (i.e. 0.25, 0.5, 0.75). 
 
 Following Eq. \@ref(eq:simulation), a population where $\mu = 250$ and $\sigma=0.5$ can be simulated across one million locations using the following R code:
 
@@ -115,6 +115,8 @@ D <- sample(x = pop,
 
 To draw a population-weighted sample, we first calculated sampling probabilities based on the population at each location. These were then used to draw a weighted (i.e. non-random) sample from the population in which locations with higher population densities were over-represented.
 
+> Note: A random sample is equivalent to a weighted sample in which all samples have equal weights. 
+
 ```{r, eval=F}
 # sampling weights based on population density 
 w <- pop / sum(pop)
@@ -130,7 +132,7 @@ D <- pop[i]
 
 ### Combined Sample {-}
 
-Combined samples (random and weighted) were produced using several different proportions of random samples (i.e. 0.2, 0.5, 0.8). 
+Combined samples (random and weighted) were produced using several different proportions of random samples (i.e. 0.2, 0.5, and 0.8). 
 
 ```{r, eval=F}
 # proportion random
@@ -244,13 +246,13 @@ A potential alternative to the weighted-likelihood approach would be to scale th
 \end{split}
 \end{equation}
 
-For this model, we need to define an inverse sampling weight $m_i$ that is scaled to sum to one across all samples:
+For this model, we define an inverse sampling weight $m_i$ that is scaled to sum to one across all samples:
 
 \begin{equation}
   m_i = \frac{w_i^{-1}}{\sum_{i=1}^{n}{w_i^{-1}}}
 \end{equation}
 
-We will refer to these scaled invserse sampling weights as model weights $m_i$. Now we can specify a weighted-precision model as:
+We will refer to these scaled inverse sampling weights as model weights $m_i$. Now we can specify a weighted-precision model as:
 
 \begin{equation}
 \begin{split}
@@ -259,7 +261,7 @@ We will refer to these scaled invserse sampling weights as model weights $m_i$. 
 \end{split}
 \end{equation}
 
-where $\theta^{-2}$ is a naive precision that does not account for the model weights $m_i$. Notice that the precision $\tau_i$ is location-specific (i.e. indexed by $i$) because it has been adjusted by the model weights $m_i$, and that $\tau_i^{-0.5}$ is an adjusted location-specific standard deviation. Where the model weights are relatively low, the location-specific precisions $\tau_i$ will be decreased to reduce the weight of those samples in the model. For our population-weighted sample, this reduced the weights of locations with high population densities that were over-represented in the sample.
+where $\theta^{-2}$ is a naive precision term that does not account for the model weights $m_i$. Notice that the precision $\tau_i$ is location-specific (i.e. indexed by $i$) because it has been adjusted by the model weights $m_i$, and that $\tau_i^{-0.5}$ is an adjusted location-specific standard deviation. Where the model weights are relatively low, the location-specific precisions $\tau_i$ will be decreased to reduce the weight of those samples in the model. For our population-weighted sample, this reduced the weights of locations with high population densities that were over-represented in the sample.
 
 Our goal was to recover an unbiased estimate of the standard deviation for the overall distribution of population densities among all locations in the population. So far, we have only estimated location-specific precisions $\tau_i$ that are dependent on location-specific model weights $m_i$. We derived the global standard deviation $\sigma$ using a weighted average of the location-specific standard deviations $\tau_i^{-0.5}$:
 
@@ -267,9 +269,9 @@ Our goal was to recover an unbiased estimate of the standard deviation for the o
   \sigma = \frac{\sum_{i=1}^{n}{\tau_i^{-0.5} \sqrt{m_i}}} {\sum_{i=1}^{n}{\sqrt{m_i}}}
 \end{equation}
 
-We used $\sqrt{m_i}$ for this weighted average so that the weights are on the same scale as the standard deviations being averaged.  Remember the model weights $m_i$ were used to adjust a naive *precision* parameter and so here we want to use a square root transformed weight to calculate a weighted average of standard deviations $\tau_i^{-0.5}$.
+We used $\sqrt{m_i}$ for this weighted average so that the weights are on the same scale as the standard deviations being averaged.  Remember that the model weights $m_i$ were used to adjust a naive *precision* parameter and so here we want to use a square root transformed weight to calculate a weighted average of standard deviations $\tau_i^{-0.5}$.
 
-Here we implemented the weighted-precision model in Stan:
+We implemented the weighted-precision model in Stan:
 
 ```{r, eval=F}
 data{
@@ -314,7 +316,7 @@ generated quantities {
 
 ### Weighted-precision (JAGS) {-}
 
-We also implemented the weighted-precision model using JAGS software to provide an example of the coding differences and to demonstrate that they produce the same results. JAGS parameterizes the log-normal distribution using precision rather than standard deviation (as in Stan). 
+We also implemented the weighted-precision model using JAGS software to provide an example of the coding differences and to demonstrate that both Stan and JAGS produce the same results. JAGS parameterizes the log-normal distribution using precision rather than the standard deviation used by Stan. 
 
 ```{r, eval=F}
 model{
@@ -357,26 +359,26 @@ The location-specific posterior predictions for population densities $D_i$ (i.e.
 
 # Results {-}
 
-Results presented here are based on simulated populations where $\mu = 250$ and $\sigma = 0.5$. For simulations that contained a combination of random and weighted samples, we used a 50/50 split (i.e. $prop=0.5$). We explored other combinations of parameters and those results are included in the supplementary files in Appendix A. Supplementary files also include source code that can be used to reproduce results and to conduct simulations using other parameters.
+Results presented here are based on simulated populations where $\mu = 250$ and $\sigma = 0.5$. For simulations that contained a combination of random and weighted samples, we used a 50/50 split (i.e. $prop=0.5$). We explored other combinations of parameters and those results are included in the supplementary files in Appendix A. Supplementary files also include source code to reproduce these results and to conduct simulations using other parameters.
 
 The unweighted model was able to recover the simulated "true" distribution of population densities from a random sample but not from a population-weighted sample (top panels of Fig. \@ref(fig:distributions)). All three weighted models were able to recover the "true" population distribution from a population-weighted sample and a combined sample (bottom panels of Fig. \@ref(fig:distributions)). Posterior predicted distributions of population densities were very similar for all of the weighted models (Fig. \@ref(fig:weighted3ways)).  
 
-Some important differences were apparent among the three weighted models when we looked at individual parameter estimates for the median $\mu$, standard deviation $\sigma$, and mean ($\mu e^{0.5\sigma^2}$). Most importantly, the weighted-likelihood approach produced marginal posterior distributions that were so narrow that they were essentially point-estimates that did not account for paramater uncertainty (Fig. \@ref(fig:parameters-likelihood)). Although they did not adequately account for parameter uncertainty, the point-estimates appeared to be unbiased estimators (Tables \@ref(tab:median-likelihood), \@ref(tab:mean-likelihood), and \@ref(tab:sigma-likelihood)).
+Some important differences were apparent among the three weighted models when we looked at individual parameter estimates for the median $\mu$, standard deviation $\sigma$, and mean ($\mu e^{0.5\sigma^2}$). Most importantly, the weighted-likelihood approach produced marginal posterior distributions that were so narrow that they were essentially point-estimates that did not account for parameter uncertainty (Fig. \@ref(fig:parameters-likelihood)). Although they did not adequately account for parameter uncertainty, the point-estimates appeared to be unbiased estimators (Tables \@ref(tab:median-likelihood), \@ref(tab:mean-likelihood), and \@ref(tab:sigma-likelihood)).
 
-In contrast, the weighted-precision approaches produced full posteriors that accounted for parameter uncertainty (Fig. \@ref(fig:parameters-precision); Tables \@ref(tab:median-likelihood), \@ref(tab:mean-likelihood), and \@ref(tab:sigma-likelihood)). As expected, unweighted models that were fit to population-weighted samples significantly overestimated the median $\mu$ and the mean ($\mu e^{0.5\sigma^2}$), but surprisingly not the standard deviation $\sigma$ (Fig. \@ref(fig:parameters-precision)).
+In contrast, the weighted-precision approaches produced full posteriors that accounted for parameter uncertainty (Fig. \@ref(fig:parameters-precision); Tables \@ref(tab:median-likelihood), \@ref(tab:mean-likelihood), and \@ref(tab:sigma-likelihood)). As expected, unweighted models that were fit to population-weighted samples significantly overestimated the median $\mu$ and the mean ($\mu e^{0.5\sigma^2}$), but not the standard deviation $\sigma$ (Fig. \@ref(fig:parameters-precision)).
 
-The bias that we saw in parameter estimates from an unweighted model fit to a population-weighted sample resulted in significant overestimation of the total population when the model predictions were applied across one million locations (scenario "wu" in Fig. \@ref(fig:bartotals-precision); Table \@ref(tab:totals-precision)). The weighted models were all able to recover unbiased estimates of the total population, but the weighted-likelihood approach did not produce robust credible intervals (Fig. \@ref(fig:bartotals-likelihood); Table \@ref(tab:totals-likelihood)). This was presumedly because of the previously mentioned issue with the weighted-likelihood failing to account for parameter uncertainty. The weighted-precision approaches produced unbiased estimators of total population and robust credible intervals (Fig. \@ref(fig:bartotals-precision); Table \@ref(tab:totals-precision)).
+The bias in parameter estimates from an unweighted model fit to a population-weighted sample resulted in significant overestimation of the total population when the model predictions were applied across one million locations (scenario "wu" in Fig. \@ref(fig:bartotals-precision); Table \@ref(tab:totals-precision)). The weighted models were all able to recover unbiased estimates of the total population, but the weighted-likelihood approach did not produce robust credible intervals (Fig. \@ref(fig:bartotals-likelihood); Table \@ref(tab:totals-likelihood)). This was presumedly because of the previously mentioned issue with the weighted-likelihood failing to account for parameter uncertainty. The weighted-precision approaches produced unbiased estimators of total population and robust credible intervals (Fig. \@ref(fig:bartotals-precision); Table \@ref(tab:totals-precision)).
 
 
 # Discussion {-}
 
-Results suggested that the weighted-precision model was the only approach that recovered unbiased estimates of population densities and population totals with robust credible intervals from population-weighted samples. The weighted-likelihood model recovered unbiased estimates of population densities and totals from population-weighted samples, but did not produce robust credible intervals. The unweighted model recovered unbiased estimates with robust credible intervals from random samples, but produced significantly biased estimates of population densities and totals from population-weighted samples. For these reasons, we recommend the weighted-precision model for use with population-weighted samples and we have demonstrated that the Stan and JAGS implementations of this model produced the same results. 
+The results suggested that the weighted-precision model was the only approach that recovered unbiased estimates of population densities and population totals with robust credible intervals from population-weighted samples. The weighted-likelihood model recovered unbiased estimates of population densities and totals from population-weighted samples, but did not produce robust credible intervals. The unweighted model recovered unbiased estimates with robust credible intervals from random samples, but produced significantly biased estimates of population densities and totals from population-weighted samples. For these reasons, we recommend the weighted-precision model for use with population-weighted samples and we have demonstrated that the Stan and JAGS implementations of this model produced the same results. 
 
-Our simulation made some simplifying assumptions to isolate effects of population-weighted sample designs on these statistical models.  For the simulations, we assumed that area of settlement was equal in every location and we ignored the effects of settlement type (urban/rural), geographic location, and other geospatial covariates.     Exploring the effects of these factors in a simulation framework was beyond the scope of this proof-of-concept study, but we encourage further investigation using a combination of empirical and simulation-based studies.
+Compared to the statistical model presented by Leasure et al [-@leasure2020national], our simulation made some simplifying assumptions to isolate effects of population-weighted sample designs on these statistical models.  For the simulations, we assumed that area of settlement was equal in every location and we ignored the effects of settlement type (urban/rural), geographic location, and other geospatial covariates.     Exploring the effects of these factors in a simulation framework was beyond the scope of this proof-of-concept study, but we encourage further investigation using a combination of empirical and simulation-based studies.
 
-We defined the sampling weights as the probability of a location being selected for the sample. In a random sample, those probabilities would be equal across all locations in the population. In our simulation of population-weighted sampling, we simply defined this based on the proportion of the total population that occured in each location, and we defined locations has having of equal geographic size. In practice, the sampling weights used for PPS sample designs in household surveys are often much more complicated, involving weighted selection of survey clusters from a national sampling frame followed by weighted sampling of households within the selected clusters. This presents additional challenges for weighted models using these real-world weighted survey data [@gelman2007struggles]. Our simulation demonstrated that the weighted models can recover unbiased parameter estimates from a population-weighted sample, but this only holds true if the available sampling weights represent the true probability of each survey cluster being selected from the national sampling frame.
+We defined the sampling weights as the probability of a location being selected for the sample. In a random sample, those probabilities would be equal across all locations in the population. In our simulation of population-weighted sampling, we simply defined this based on the proportion of the total population that occurred in each location, and we defined locations as having equal geographic size. In practice, the sampling weights used for PPS sample designs in household surveys are often much more complicated, involving weighted selection of survey clusters from a national sampling frame followed by weighted sampling of households within the selected clusters. This presents additional challenges for weighted models using these real-world weighted survey data [@gelman2007struggles]. Our simulation demonstrated that the weighted models can recover unbiased parameter estimates from a population-weighted sample, but this only holds true if the available sampling weights represent the true probability of each survey cluster being selected from the national sampling frame.
 
-Weighted-precision models were used to produce 100 m gridded population estimates for Zambia [@dooley2020bottomup] and Democratic Republic of the Congo [@boo2020modelled; @boo2020bottomup]. These publications implemented a full version of the weighted-precision model that extended the core model of Leasure et al [-@leasure2020national] from Eq. \@ref(eq:pnas) to include a weighted-precision that accounted for population-weighted sample data while also accounting for geographical location, settlement type (urban/rural), building footprints, and other geospatial covariates.
+Weighted-precision models were used to produce high-resolution gridded population estimates for Zambia [@dooley2020bottomup] and Democratic Republic of the Congo [@boo2020modelled; @boo2020bottomup]. These publications implemented a full version of the weighted-precision model that extended the core model of Leasure et al [-@leasure2020national] from Eq. \@ref(eq:pnas) to include a weighted-precision that accounted for population-weighted sample data while also accounting for geographical location, settlement type (urban/rural), building footprints, and other geospatial covariates.
 
 The weighted-likelihood approach seemed to produce point-estimates rather than true Bayesian posterior distributions that accounted for paramater uncertainty (Fig. \@ref(fig:parameters-likelihood)). This was presumedly the result of the direct modification of the likelihood in the Stan model (see section [Weighted-likelihood]). This implementation of weighted-likelihood is not advised for adjusting a log-normal distribution, but it may perform better for discrete distributions where sufficient statistics are appropriate (See "[Exploiting sufficient statistics](https://mc-stan.org/docs/2_26/stan-users-guide/exploiting-sufficient-statistics.html)" in the "Efficiency Tuning" chapter of the Stan User Guide [-@stan2019stan]). More investigation is needed on this topic to determine if this approach may be suitable for the one-inflated Poisson models [@leasure2020approach] developed to produce full coverage gridded population estimates of people per household from census microdata [@mpc2019integrated], which sometimes include weighted samples.
 
@@ -404,6 +406,8 @@ You are free to redistribute this document under the terms of a [Creative Common
 # Tables {-}
 
 **Weighted-precision Model**
+
+>Note: The five scenarios shown are: (pop) simulated "true" population; (ru) random sample data with an unweighted model; (wu) weighted sample data with an unweighted model; (ww) weighted sample data with a weighted-precision model; (cw) combined sample data (weighted and random) with a weighted-precision model.
 
 ```{r, median-precision, echo=F, results='asis', align='center'}
 knitr::kable(x = read.csv('../wd/random + weighted/precision_med250sigma0.5prop0.5/median_table.csv', row.names=1),
@@ -438,7 +442,7 @@ knitr::kable(x = read.csv('../wd/random + weighted/precision_med250sigma0.5prop0
   kableExtra::kable_styling(latex_options = "HOLD_position")
 ```
 
-See Fig. \@ref(fig:parameters-precision) for density plots of posteriors from Tables \@ref(tab:median-precision), \@ref(tab:mean-precision), and \@ref(tab:sigma-precision); and see Fig. \@ref(fig:bartotals-precision) for a barplot of Table \@ref(tab:totals-precision). ^[(pop) simulated "true" population; (ru) random sample data with an unweighted model; (wu) weighted sample data with an unweighted model; (ww) weighted sample data with a weighted-precision model; (cw) combined sample data (weighted and random) with a weighted-precision model.]
+See Fig. \@ref(fig:parameters-precision) for density plots of posteriors from Tables \@ref(tab:median-precision), \@ref(tab:mean-precision), and \@ref(tab:sigma-precision); and see Fig. \@ref(fig:bartotals-precision) for a barplot of Table \@ref(tab:totals-precision). 
 
 
 
@@ -447,6 +451,8 @@ See Fig. \@ref(fig:parameters-precision) for density plots of posteriors from Ta
 \newpage
 
 **Weighted-likelihood Model**
+
+>Note: The five scenarios shown are: (pop) simulated "true" population; (ru) random sample data with an unweighted model; (wu) weighted sample data with an unweighted model; (ww) weighted sample data with a weighted-likelihood model; (cw) combined sample data (weighted and random) with a weighted-likelihood model.
 
 ```{r, median-likelihood, echo=F, results='asis'}
 knitr::kable(x = read.csv('../wd/random + weighted/likelihood_med250sigma0.5prop0.5/median_table.csv', row.names=1),
@@ -481,7 +487,7 @@ knitr::kable(x = read.csv('../wd/random + weighted/likelihood_med250sigma0.5prop
   kableExtra::kable_styling(latex_options = "HOLD_position")
 ```
 
-See Fig. \@ref(fig:parameters-likelihood) for density plots of posteriors from Tables \@ref(tab:median-likelihood), \@ref(tab:mean-likelihood), and \@ref(tab:sigma-likelihood); and see Fig. \@ref(fig:bartotals-likelihood) for a barplot of Table \@ref(tab:totals-likelihood). ^[(pop) simulated "true" population; (ru) random sample data with an unweighted model; (wu) weighted sample data with an unweighted model; (ww) weighted sample data with a weighted-likelihood model; (cw) combined sample data (weighted and random) with a weighted-likelihood model.] 
+See Fig. \@ref(fig:parameters-likelihood) for density plots of posteriors from Tables \@ref(tab:median-likelihood), \@ref(tab:mean-likelihood), and \@ref(tab:sigma-likelihood); and see Fig. \@ref(fig:bartotals-likelihood) for a barplot of Table \@ref(tab:totals-likelihood).  
 
 
 \newpage
@@ -507,12 +513,12 @@ knitr::include_graphics('../wd/random + weighted/precision_med250sigma0.5prop0.5
 ```
 
 \newpage
-```{r, bartotals-likelihood, fig.cap="Posterior predicted population totals from a weighted-likelihood model. Population totals include one million locations from the full simulated population. The four scenarios are: (ru) random sample data with an unweighted model; (wu) weighted sample data with an unweighted model; (ww) weighted sample data with a weighted model; and (cw) combined sample data (weighted and random) with a weighted model. The horizonal line is the simulated 'true' total population size.", out.width="70%", fig.align="center", fig.show='hold', echo=FALSE}
+```{r, bartotals-likelihood, fig.cap="Posterior predicted population totals from a weighted-likelihood model. Population totals include one million locations from the full simulated population. The four scenarios are: (ru) random sample data with an unweighted model; (wu) weighted sample data with an unweighted model; (ww) weighted sample data with a weighted model; and (cw) combined sample data (weighted and random) with a weighted model. The horizontal line is the simulated 'true' total population size.", out.width="70%", fig.align="center", fig.show='hold', echo=FALSE}
 knitr::include_graphics('../wd/random + weighted/likelihood_med250sigma0.5prop0.5/totals.jpg')
 ```
 
 \newpage
-```{r, bartotals-precision, fig.cap="Posterior predicted population totals from a weighted-precision model. Population totals include one million locations from the full simulated population. The four scenarios are: (ru) random sample data with an unweighted model; (wu) weighted sample data with an unweighted model; (ww) weighted sample data with a weighted model; and (cw) combined sample data (weighted and random) with a weighted model. The horizonal line is the simulated 'true' total population size.", out.width="70%", fig.align="center", fig.show='hold', echo=FALSE}
+```{r, bartotals-precision, fig.cap="Posterior predicted population totals from a weighted-precision model. Population totals include one million locations from the full simulated population. The four scenarios are: (ru) random sample data with an unweighted model; (wu) weighted sample data with an unweighted model; (ww) weighted sample data with a weighted model; and (cw) combined sample data (weighted and random) with a weighted model. The horizontal line is the simulated 'true' total population size.", out.width="70%", fig.align="center", fig.show='hold', echo=FALSE}
 knitr::include_graphics('../wd/random + weighted/precision_med250sigma0.5prop0.5/totals.jpg')
 ```
 
