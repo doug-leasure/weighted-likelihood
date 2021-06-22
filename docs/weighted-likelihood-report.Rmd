@@ -36,7 +36,7 @@ This analysis was intended as a theoretical foundation to support ongoing develo
 
 # Methods {-}
 
-We simulated populations by drawing population densities for each location from a distribution with known parameters. We then produced various types of samples from those populations: random, population-weighted, or a combination. Every population included one million locations and every sample included 2000 locations. We fit three types of models to these data trying to recover the known population parameters: unweighted model, weighted-precision model, and weighted-likelihood model.
+We simulated populations by drawing population densities for each location from a distribution with known parameters. We then produced various types of samples from those populations: random, population-weighted, or a combination. Every population included one million locations and every sample included 2000 locations. A simulated "location" could represent a 1 hectare populated grid square. We fit three types of models to these data trying to recover the known population parameters: unweighted model, weighted-precision model, and weighted-likelihood model.
 
 All simulations were conducted using the R statistical programming environment [@r2020r]. Statistical models were fit using either the *RStan* R package [@stan2020rstan] with the Stan probabilistic programming language [@stan2019stan] or the *runjags* R package [@denwood2016runjags] with JAGS software [@plummer2003jags].
 
@@ -132,7 +132,7 @@ D <- pop[i]
 
 ### Combined Sample {-}
 
-Combined samples (random and weighted) were produced using several different proportions of random samples (i.e. 0.2, 0.5, and 0.8). 
+Combined samples (random and weighted) were produced using several different proportions of random samples (i.e. 0.2, 0.5, and 0.8). For example, if 20% of the 2000 sampled locations were random samples, then 80% of the 2000 sampled locations would have been weighted samples.
 
 ```{r, eval=F}
 # proportion random
@@ -156,6 +156,9 @@ w_j <- rep(x = mean(w_i),
 
 # population densities at selected locations
 D <- pop[ c(i,j) ]
+
+# weights at selected locations
+w <- c(w_i, w_j)
 ```
 Notice that we assigned equal weights to all of the random samples that were equal to the mean weight among the weighted samples. In other words, each random sample was given an equal weight in the model comparable to an average weighted sample. This was intended to balance the influence of the random and weighted portions of the sample.
 
@@ -232,7 +235,7 @@ model{
 ```
 > Note: The sampling probabilities `w` were defined in the section above (see [Simulated Survey Data]). 
 
-In this model, the likelihood for each sample is divided by its sampling probability--the probability of a location being selected for the sample out of the one million locations in the population. This adjustment to the likelihood reduces the influence on parameter estimates of locations that had higher sampling probabilities (i.e. locations with high population densities are over-represented in a population-weighted sample). If this model were used for a random sample, all of the weights would be equal and it would be equivalent to the unweighted model above (see [Unweighted Log-normal]).
+In this model, the likelihood for each sample is divided by its sampling probability--the probability of a location being selected for the sample out of the one million locations in the population. This adjustment to the likelihood normalizes the influence on parameter estimates of locations that had higher sampling probabilities (i.e. locations with high population densities are over-represented in a population-weighted sample). If this model were used for a random sample, all of the weights would be equal and it would be equivalent to the unweighted model above (see [Unweighted Log-normal]).
 
 
 ### Weighted-precision (Stan) {-}
@@ -359,13 +362,13 @@ The location-specific posterior predictions for population densities $D_i$ (i.e.
 
 # Results {-}
 
-Results presented here are based on simulated populations where $\mu = 250$ and $\sigma = 0.5$. For simulations that contained a combination of random and weighted samples, we used a 50/50 split (i.e. $prop=0.5$). We explored other combinations of parameters and those results are included in the supplementary files in Appendix A. Supplementary files also include source code to reproduce these results and to conduct simulations using other parameters.
+Results presented here are based on simulated populations where $\mu = 250$ and $\sigma = 0.5$. For simulations that contained a combination of random and weighted samples, we used a 50/50 split (i.e. $prop=0.5$). We explored other combinations of parameters which produced results similar to those presented here (see supplementary files in Appendix A). Supplementary files also include source code to reproduce these results and to conduct simulations using other parameters.
 
 The unweighted model was able to recover the simulated "true" distribution of population densities from a random sample but not from a population-weighted sample (top panels of Fig. \@ref(fig:distributions)). All three weighted models were able to recover the "true" population distribution from a population-weighted sample and a combined sample (bottom panels of Fig. \@ref(fig:distributions)). Posterior predicted distributions of population densities were very similar for all of the weighted models (Fig. \@ref(fig:weighted3ways)).  
 
-Some important differences were apparent among the three weighted models when we looked at individual parameter estimates for the median $\mu$, standard deviation $\sigma$, and mean ($\mu e^{0.5\sigma^2}$). Most importantly, the weighted-likelihood approach produced marginal posterior distributions that were so narrow that they were essentially point-estimates that did not account for parameter uncertainty (Fig. \@ref(fig:parameters-likelihood)). Although they did not adequately account for parameter uncertainty, the point-estimates appeared to be unbiased estimators (Tables \@ref(tab:median-likelihood), \@ref(tab:mean-likelihood), and \@ref(tab:sigma-likelihood)).
+Some important differences were apparent among the three weighted models when we looked at individual parameter estimates for the median $\mu$, standard deviation $\sigma$, and mean ($\mu e^{0.5\sigma^2}$). Most importantly, the weighted-likelihood approach produced marginal posterior distributions that were so narrow that they were essentially point-estimates that did not account for parameter uncertainty (Fig. \@ref(fig:parameters-likelihood)). Although they did not adequately account for parameter uncertainty (i.e. uncertainty in statistical estimates of the mean, median, and standard deviations), the point-estimates appeared to be unbiased estimators (Tables \@ref(tab:median-likelihood), \@ref(tab:mean-likelihood), and \@ref(tab:sigma-likelihood)).
 
-In contrast, the weighted-precision approaches produced full posteriors that accounted for parameter uncertainty (Fig. \@ref(fig:parameters-precision); Tables \@ref(tab:median-likelihood), \@ref(tab:mean-likelihood), and \@ref(tab:sigma-likelihood)). As expected, unweighted models that were fit to population-weighted samples significantly overestimated the median $\mu$ and the mean ($\mu e^{0.5\sigma^2}$), but not the standard deviation $\sigma$ (Fig. \@ref(fig:parameters-precision)).
+In contrast, the weighted-precision approaches produced full posteriors that accounted for parameter uncertainty (Fig. \@ref(fig:parameters-precision); Tables \@ref(tab:median-precision), \@ref(tab:mean-precision), and \@ref(tab:sigma-precision)). As expected, unweighted models that were fit to population-weighted samples significantly overestimated the median $\mu$ and the mean ($\mu e^{0.5\sigma^2}$), but not the standard deviation $\sigma$ (Fig. \@ref(fig:parameters-precision)).
 
 The bias in parameter estimates from an unweighted model fit to a population-weighted sample resulted in significant overestimation of the total population when the model predictions were applied across one million locations (scenario "wu" in Fig. \@ref(fig:bartotals-precision); Table \@ref(tab:totals-precision)). The weighted models were all able to recover unbiased estimates of the total population, but the weighted-likelihood approach did not produce robust credible intervals (Fig. \@ref(fig:bartotals-likelihood); Table \@ref(tab:totals-likelihood)). This was presumedly because of the previously mentioned issue with the weighted-likelihood failing to account for parameter uncertainty. The weighted-precision approaches produced unbiased estimators of total population and robust credible intervals (Fig. \@ref(fig:bartotals-precision); Table \@ref(tab:totals-precision)).
 
@@ -407,7 +410,7 @@ You are free to redistribute this document under the terms of a [Creative Common
 
 **Weighted-precision Model**
 
->Note: The five scenarios shown are: (pop) simulated "true" population; (ru) random sample data with an unweighted model; (wu) weighted sample data with an unweighted model; (ww) weighted sample data with a weighted-precision model; (cw) combined sample data (weighted and random) with a weighted-precision model.
+>Note: The five scenarios shown are: (pop) simulated "true" population; (ru) random sample data with an unweighted model; (wu) weighted sample data with an unweighted model; (ww) weighted sample data with a weighted-precision model; (cw) combined sample data (weighted and random) with a weighted-precision model. The "lower" and "upper" columns show 95% credible intervals. 
 
 ```{r, median-precision, echo=F, results='asis', align='center'}
 knitr::kable(x = read.csv('../wd/random + weighted/precision_med250sigma0.5prop0.5/median_table.csv', row.names=1),
@@ -452,7 +455,7 @@ See Fig. \@ref(fig:parameters-precision) for density plots of posteriors from Ta
 
 **Weighted-likelihood Model**
 
->Note: The five scenarios shown are: (pop) simulated "true" population; (ru) random sample data with an unweighted model; (wu) weighted sample data with an unweighted model; (ww) weighted sample data with a weighted-likelihood model; (cw) combined sample data (weighted and random) with a weighted-likelihood model.
+>Note: The five scenarios shown are: (pop) simulated "true" population; (ru) random sample data with an unweighted model; (wu) weighted sample data with an unweighted model; (ww) weighted sample data with a weighted-likelihood model; (cw) combined sample data (weighted and random) with a weighted-likelihood model.  The "lower" and "upper" columns show 95% credible intervals.
 
 ```{r, median-likelihood, echo=F, results='asis'}
 knitr::kable(x = read.csv('../wd/random + weighted/likelihood_med250sigma0.5prop0.5/median_table.csv', row.names=1),
@@ -493,7 +496,7 @@ See Fig. \@ref(fig:parameters-likelihood) for density plots of posteriors from T
 \newpage
 # Figures {-}
 
-```{r, distributions, fig.cap="Posterior predicted distributions of population densities from an unweighted model and a weighted-precision model (solid lines show models) using a random sample, a population-weighted sample, and a combination sample (dashed lines show data). Only the weighted-precision model results are shown here, but results were comparable with the weighted-likelihood model.", out.width="90%", fig.align="center", echo=FALSE}
+```{r, distributions, fig.cap="Posterior predicted distributions of population densities from an unweighted model and a weighted-precision model using a random sample, a population-weighted sample, and a combination sample. Dashed lines show distributions of population data from the sample of locations. Solid lines show distributions of model-based population estimates across the sample of locations. Only the weighted-precision model (Stan) results are shown here, but results were comparable with the weighted-likelihood model (Stan) and weighted-precision model (JAGS) (see supplementary files in Appendix A).", out.width="90%", fig.align="center", echo=FALSE}
 knitr::include_graphics('../wd/random + weighted/precision_med250sigma0.5prop0.5/distributions.jpg')
 ```
 
@@ -503,7 +506,7 @@ knitr::include_graphics('../wd/weighted3ways/med250sigma0.5/results_med250sigma0
 ```
 
 \newpage
-```{r, parameters-likelihood, fig.cap="Parameter estimates for the median, mean, and sigma from the weighted-likelihood model. The four scenarios are: (ru) random sample data with an unweighted model; (wu) weighted sample data with an unweighted model; (ww) weighted sample data with a weighted model; and (cw) combined sample data (weighted and random) with a weighted model. The vertical red line is the simulated 'true' parameter estimate.", out.width="100%", fig.align="center", fig.show='hold', echo=FALSE}
+```{r, parameters-likelihood, fig.cap="Parameter estimates (marginal posterior distributions) for the median, mean, and sigma from the weighted-likelihood model. The four scenarios are: (ru) random sample data with an unweighted model; (wu) weighted sample data with an unweighted model; (ww) weighted sample data with a weighted model; and (cw) combined sample data (weighted and random) with a weighted model. The vertical red line is the simulated 'true' parameter estimate.", out.width="100%", fig.align="center", fig.show='hold', echo=FALSE}
 knitr::include_graphics('../wd/random + weighted/likelihood_med250sigma0.5prop0.5/parameters.jpg')
 ```
 
@@ -523,7 +526,7 @@ knitr::include_graphics('../wd/random + weighted/precision_med250sigma0.5prop0.5
 ```
 
 \newpage
-# Appendix A: Supplementary Code {-}
+# Appendix A: Supplementary Files {-}
 
 All code used to conduct the simulation analyses and produce results are provided in a supplementary file that is available from http://doi.org/10.5258/SOTON/WP00706. The supplemental code can be used to replicate the results in this report and to explore different simulation settings and model designs.
 

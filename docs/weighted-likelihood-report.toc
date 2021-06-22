@@ -9,7 +9,7 @@
 \contentsline {subsubsection}{Unweighted Log-normal}{6}{section*.10}%
 \contentsline {subsubsection}{Weighted-likelihood}{6}{section*.11}%
 \contentsline {subsubsection}{Weighted-precision (Stan)}{7}{section*.12}%
-\contentsline {subsubsection}{Weighted-precision (JAGS)}{8}{section*.13}%
+\contentsline {subsubsection}{Weighted-precision (JAGS)}{9}{section*.13}%
 \contentsline {subsection}{Population Totals}{9}{section*.14}%
 \contentsline {section}{Results}{9}{section*.15}%
 \contentsline {section}{Discussion}{10}{section*.16}%
@@ -19,4 +19,4 @@
 \contentsline {section}{References}{11}{section*.20}%
 \contentsline {section}{Tables}{13}{section*.21}%
 \contentsline {section}{Figures}{15}{section*.22}%
-\contentsline {section}{Appendix A: Supplementary Code}{21}{section*.23}%
+\contentsline {section}{Appendix A: Supplementary Files}{21}{section*.23}%
