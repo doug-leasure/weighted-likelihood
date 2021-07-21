@@ -1,6 +1,6 @@
 # weighted-likelihood
 
-The goal of this repository is to explore options for producing unbiased population estimates using weighted survey data.
+The goal of this repository is to explore options for producing unbiased population estimates using weighted survey data, including a full report describing the methods and findings (Leasure et al 2021). The published report with supplementary data is available from <a href="https://doi.org/10.5258/SOTON/WP00706" target="_blank">https://doi.org/10.5258/SOTON/WP00706</a>.
 
 This repository includes:
 1. code to simulate population counts in x units
